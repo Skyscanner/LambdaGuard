@@ -1,0 +1,13 @@
+*.aws
+*.DS_Store
+*.vscode
+venv
+*__pycache__
+*cache*
+*.pytest_cache
+*.pypirc
+*.egg-info
+dev
+lambdaguard_output*
+build
+dist

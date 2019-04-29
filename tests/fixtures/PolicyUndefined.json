@@ -1,0 +1,25 @@
+{
+    "Version": "2012-10-17",
+    "Id": "arn:aws:sqs:eu-west-1:0:queue/SQSDefaultPolicy",
+    "Statement": [{
+        "Sid": "Default",
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "SQS:*",
+        "Resource": "arn:aws:sqs:eu-west-1:0:queue"
+    }, {
+        "Sid": "Undefined",
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "SQS:*",
+        "Resource": "arn:aws:sqs:eu-west-1:0:queue",
+        "Condition": ""
+    }, {
+        "Sid": "Undefined",
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "SQS:*",
+        "Resource": "arn:aws:sqs:eu-west-1:0:queue",
+        "Condition": {}
+    }]
+}

@@ -1,0 +1,36 @@
+<tr data-toggle="collapse" data-target="#{index}-json">
+    <td id="{index}" colspan="2">{arn}</td>
+    <td>{region}</td>
+    <td>{runtime}</td>
+</tr>
+<tr class="collapse" id="{index}-json">
+    <td colspan="4">
+        <table class="table table-condensed">
+            <tbody>
+                <tr><td>ARN</td><td colspan="3">{arn}</td></tr>
+                <tr><td>Name</td><td colspan="3">{name}</td></tr>
+                <tr><td>Description</td><td colspan="3">{description}</td></tr>
+                <tr><td>Region</td><td colspan="3">{region}</td></tr>
+                <tr><td>Runtime</td><td colspan="3">{runtime}</td></tr>
+                <tr><td>Handler</td><td colspan="3">{handler}</td></tr>
+                <tr><td>Role</td><td colspan="3">{role}</td></tr>
+                <tr><td>Triggers ({triggers_count})</td><td colspan="3">{triggers}</td></tr>
+                <tr><td>Resources ({resources_count})</td><td colspan="3">{resources}</td></tr>
+                <tr><td>Security ({security_count})</td><td colspan="3">
+                    <table class="table table-condensed">
+                        <thead>
+                            <th>Level</th>
+                            <th>Text</th>
+                            <th>Where</th>
+                        </thead>
+                        <tbody>
+                            {security}
+                        </tbody>
+                    </table>
+                </td></tr>
+                <tr><td>Function policy</td><td colspan="3"><pre>{policy}</pre></td></tr>
+                <tr><td>Execution role policy</td><td colspan="3"><pre>{role_policy}</pre></td></tr>
+            </tbody>
+        </table>
+    </td>
+</tr>

@@ -1,0 +1,35 @@
+{
+    "Version": "2012-10-17",
+    "Id": "arn:aws:sqs:eu-west-1:0:queue/SQSDefaultPolicy",
+    "Statement": [{
+        "Sid": "Default",
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": "SQS:*",
+        "Resource": "arn:aws:sqs:eu-west-1:0:queue"
+    }, {
+        "Sid": "Unrestricted",
+        "Effect": "Allow",
+        "Principal": ["*"],
+        "Action": "*",
+        "Resource": "arn:aws:sqs:eu-west-1:0:queue"
+    }, {
+        "Sid": "Unrestricted",
+        "Effect": "Allow",
+        "Principal": {"AWS": "*"},
+        "Action": ["*"],
+        "Resource": "arn:aws:sqs:eu-west-1:0:queue"
+    }, {
+        "Sid": "Unrestricted",
+        "Effect": "Allow",
+        "Principal": {"AWS": ["*"]},
+        "Action": "*",
+        "Resource": "arn:aws:sqs:eu-west-1:0:queue"
+    }, {
+        "Sid": "Unrestricted",
+        "Effect": "Allow",
+        "Principal": [{"AWS": ["*"]}],
+        "Action": ["sqs:*"],
+        "Resource": "arn:aws:sqs:eu-west-1:0:queue"
+    }]
+}

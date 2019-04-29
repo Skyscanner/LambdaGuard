@@ -1,0 +1,37 @@
+{
+    "Owner": {
+        "DisplayName": "owner",
+        "ID": "id"
+    },
+    "Grants": [
+        {
+            "Grantee": {
+                "DisplayName": "owner",
+                "ID": "id",
+                "Type": "CanonicalUser"
+            },
+            "Permission": "FULL_CONTROL"
+        },
+        {
+            "Grantee": {
+                "Type": "Group",
+                "URI": "http://acs.amazonaws.com/groups/global/AllUsers"
+            },
+            "Permission": "READ"
+        },
+        {
+            "Grantee": {
+                "Type": "Group",
+                "URI": "http://acs.amazonaws.com/groups/global/AllUsers"
+            },
+            "Permission": "WRITE"
+        },
+        {
+            "Grantee": {
+                "Type": "Group",
+                "URI": "http://acs.amazonaws.com/groups/global/AuthenticatedUsers"
+            },
+            "Permission": "FULL_CONTROL"
+        }
+    ]
+}

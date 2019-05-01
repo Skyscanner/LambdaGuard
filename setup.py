@@ -18,7 +18,7 @@ from pathlib import Path
 
 version = Path('lambdaguard/version.txt').read_text()
 long_description = '''
-Half-Life is an AWS Lambda auditing tool designed to create asset visibility 
+LambdaGuard is an AWS Serverless Security auditing tool designed to create asset visibility 
 and provide actionable results. It provides a meaningful overview in terms of 
 statistical analysis, AWS service dependencies and configuration checks from 
 the security perspective.

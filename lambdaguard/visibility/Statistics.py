@@ -22,6 +22,7 @@ class Statistics:
         self.path = Path(path)
         self.statistics = {
             'lambdas': 0,
+            'layers': 0,
             'regions': { 'count': 0, 'items': {} },
             'runtimes': { 'count': 0, 'items': {} },
             'triggers': { 'count': 0, 'items': {} },
@@ -52,6 +53,7 @@ class Statistics:
         tracks statistics.
         '''
         self.statistics['lambdas'] += 1
+        self.statistics['layers'] += len(report['layers'])
         self.track('regions', report['region'])
         self.track('runtimes', report['runtime'])
         for idx in ['triggers', 'resources']:

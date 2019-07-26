@@ -48,7 +48,7 @@ class HTMLReport:
         stats_table = assets_path.joinpath('stats.html').open().read()
         stats_table_item = assets_path.joinpath('statsitem.html').open().read()
         for title, data in stats_json.items():
-            if title in ['lambdas', 'regions']:
+            if title in ['lambdas', 'regions', 'layers']:
                 continue
 
             stats_table = stats_table.replace('{'+title+'_count}', str(data['count']))
@@ -61,7 +61,7 @@ class HTMLReport:
                 )
             stats_table = stats_table.replace('{'+title+'_items}', ''.join(stats_items))
         stats_table = stats_table.replace('{lambdas_count}', str(stats_json['lambdas']))
-        stats_table = stats_table.replace('{regions_items}', ', '.join(stats_json['regions']['items'].keys()))
+        stats_table = stats_table.replace('{layers_count}', str(stats_json['layers']))
 
         with assets_path.joinpath('highcharts.js').open() as f:
             report_html = report_html.replace('{highcharts}', f.read())
@@ -73,7 +73,7 @@ class HTMLReport:
 
         stats_js = []
         for title, data in stats_json.items():
-            if title in ['lambdas', 'regions']:
+            if title in ['lambdas', 'regions', 'layers']:
                 continue
             
             series = []
@@ -152,6 +152,10 @@ class HTMLReport:
                 ret = ret.replace('{text}', self.txt2html(_['text']))
                 funcvuln_html.append(ret)
 
+            layers = []
+            for layer in func['layers']:
+                layers.append(f"{layer['arn']} ({layer['description']})")
+
             html = func_html_template
             html = html.replace('{index}', idx)
             html = html.replace('{arn}', func['arn'])
@@ -161,6 +165,8 @@ class HTMLReport:
             html = html.replace('{runtime}', func['runtime'])
             html = html.replace('{handler}', func['handler'])
             html = html.replace('{role}', func['role'])
+            html = html.replace('{layers}', self.txt2html('\n'.join(layers)))
+            html = html.replace('{layers_count}', str(len(func['layers'])))
             html = html.replace('{triggers}', self.txt2html(', '.join(func['triggers']['services'])))
             html = html.replace('{triggers_count}', str(len(func['triggers']['services'])))
             html = html.replace('{resources}', self.txt2html(', '.join(func['resources']['services'])))

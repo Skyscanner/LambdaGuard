@@ -12,14 +12,11 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-import boto3
 import json
-import sys
 from lambdaguard.utils.arnparse import arnparse
-from lambdaguard.utils.log import log, debug
+from lambdaguard.utils.log import debug
 from lambdaguard.core.AWS import AWS
 from lambdaguard.core.Role import Role
-from lambdaguard.security import track_security
 from lambdaguard.security.Scan import Scan
 
 
@@ -34,9 +31,9 @@ class Lambda(AWS):
         self.description = None
         self.role = None
         self.codeURL = None
-        self.triggers = { 'services': [], 'items': {} }
-        self.resources = { 'services': [], 'items': {} }
-        self.security = { 'count': {}, 'items': {} }
+        self.triggers = {'services': [], 'items': {}}
+        self.resources = {'services': [], 'items': {}}
+        self.security = {'count': {}, 'items': {}}
 
         self.get_function()
         self.get_policy()
@@ -51,7 +48,7 @@ class Lambda(AWS):
         try:
             policy = self.client.get_policy(FunctionName=self.arn.resource)
             self.policy = json.loads(policy['Policy'])
-        except:
+        except Exception:
             debug(self.arn.full)
 
     def get_function(self):
@@ -80,7 +77,7 @@ class Lambda(AWS):
                         'description': layer['Description'],
                         'codeURL': layer['Content']['Location']
                     })
-        except:
+        except Exception:
             debug(self.arn.full)
 
     def get_triggers(self):
@@ -101,7 +98,7 @@ class Lambda(AWS):
 
                 # Track services
                 self.triggers['services'].append(arnparse(event['EventSourceArn']).service)
-        except:
+        except Exception:
             debug(self.arn.full)
 
         # Collect triggers from Function policy
@@ -112,7 +109,7 @@ class Lambda(AWS):
                         if 'ArnLike' in statement['Condition']:
                             if 'AWS:SourceArn' in statement['Condition']['ArnLike']:
                                 arn = statement['Condition']['ArnLike']['AWS:SourceArn']
-                                
+
                                 if type(statement['Action']) == str:
                                     self.triggers['items'][arn] = [statement['Action']]
                                 else:
@@ -120,7 +117,7 @@ class Lambda(AWS):
 
                                 # Track services
                                 self.triggers['services'].append(arnparse(arn).service)
-        except:
+        except Exception:
             debug(self.arn.full)
 
         self.triggers['services'] = list(set(self.triggers['services']))
@@ -155,12 +152,14 @@ class Lambda(AWS):
                         # Track actions by resource
                         for arn in arns:
                             if arn in self.resources['items']:
-                                self.resources['items'][arn] = list(set(self.resources['items'][arn] + actions))
+                                self.resources['items'][arn] = list(
+                                    set(self.resources['items'][arn] + actions)
+                                )
                             else:
                                 self.resources['items'][arn] = actions
 
             self.resources['services'] = list(set(self.resources['services']))
-        except:
+        except Exception:
             debug(self.arn.full)
 
     def get_security(self):
@@ -169,7 +168,7 @@ class Lambda(AWS):
                 self.report(),
                 self.args
             ).security
-        except:
+        except Exception:
             debug(self.arn.full)
 
     def report(self):

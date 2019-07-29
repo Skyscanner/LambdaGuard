@@ -12,10 +12,7 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-import boto3
-import json
-import sys
-from lambdaguard.utils.log import log, debug
+from lambdaguard.utils.log import debug
 from lambdaguard.core.AWS import AWS
 
 
@@ -49,7 +46,7 @@ class Role(AWS):
                     'arn': attached['PolicyArn'],
                     'type': 'managed'
                 })
-        except:
+        except Exception:
             debug(self.arn.full)
 
         # Collect inline policies
@@ -65,5 +62,5 @@ class Role(AWS):
                     'name': name,
                     'type': 'inline'
                 })
-        except:
+        except Exception:
             debug(self.arn.full)

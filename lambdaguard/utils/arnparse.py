@@ -13,6 +13,7 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 
+
 class ARN(object):
     def __init__(self, full, partition, service, region, account_id, resource_type, resource):
         self.full = full
@@ -23,16 +24,18 @@ class ARN(object):
         self.resource_type = resource_type
         self.resource = resource
 
+
 def empty_str_to_none(str_):
     if str_ == '':
         return None
     return str_
 
+
 def arnparse(arn_str):
     # https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
     if not arn_str.startswith('arn:'):
         return None
-    
+
     elements = arn_str.split(':', 5)
     elements += [''] * (6 - len(elements))
 
@@ -42,15 +45,15 @@ def arnparse(arn_str):
     service = elements[2]
     if service == 'execute-api':
         service = 'apigateway'
-    
+
     if service not in ['sns', 'apigateway']:
         if service == 'dynamodb':
-            resource_type = elements[5].split('/')[0] # table
-            resource = elements[5].split('/')[1] # table name
+            resource_type = elements[5].split('/')[0]  # table
+            resource = elements[5].split('/')[1]  # table name
         elif service == 's3':
             if len(elements[5].split('/')) > 1:
-                resource_type = elements[5].split('/', 1)[1] # objects
-            resource = elements[5].split('/')[0] # bucket name
+                resource_type = elements[5].split('/', 1)[1]  # objects
+            resource = elements[5].split('/')[0]  # bucket name
         elif '/' in resource:
             resource_type, resource = resource.split('/', 1)
         elif ':' in resource:

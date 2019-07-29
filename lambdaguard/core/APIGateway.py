@@ -12,9 +12,8 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-import sys
 import json
-from lambdaguard.utils.log import log, debug
+from lambdaguard.utils.log import debug
 from lambdaguard.core.AWS import AWS
 
 
@@ -38,7 +37,7 @@ class APIGateway(AWS):
         try:
             for item in self.client.get_stages(restApiId=self.rest_api_id)['item']:
                 self.stages.append(item['stageName'])
-        except:
+        except Exception:
             debug(self.arn.full)
 
         try:
@@ -47,12 +46,12 @@ class APIGateway(AWS):
                 if 'resourceMethods' in item:
                     for method in item['resourceMethods']:
                         self.resources.append(f'{method} {path}')
-        except:
+        except Exception:
             debug(self.arn.full)
 
         try:
             rest_api = self.client.get_rest_api(restApiId=self.rest_api_id)
             if 'policy' in rest_api:
                 self.policy = json.loads(rest_api['policy'].replace('\\', ''))
-        except:
+        except Exception:
             debug(self.arn.full)

@@ -16,7 +16,7 @@ import boto3
 from pathlib import Path
 from shutil import rmtree
 from lambdaguard.utils.arnparse import arnparse
-from lambdaguard.utils.cli import *
+from lambdaguard.utils.cli import parse_args, align, header, nocolor, green, orange
 from lambdaguard.utils.log import configure_log
 from lambdaguard.core.Lambda import Lambda
 from lambdaguard.core.STS import STS
@@ -58,6 +58,7 @@ def get_functions(args):
                 break
             marker = page['NextMarker']
 
+
 def run(arguments=''):
     args = parse_args(arguments)
     rmtree(args.output, ignore_errors=True)
@@ -72,7 +73,7 @@ def run(arguments=''):
 
     statistics = Statistics(args.output)
     visibility = VisibilityReport(args.output)
-    
+
     for arn in get_functions(args):
         if arnparse(arn):
             arn = arnparse(arn)
@@ -87,7 +88,7 @@ def run(arguments=''):
     HTMLReport(args.output).save()
 
     if args.verbose:
-        print('\r' + ' '*100, end='\r')  # clear
+        print('\r' + ' ' * 100, end='\r')  # clear
         align('Lambdas', statistics.statistics["lambdas"])
         align('Security', statistics.statistics["security"]["count"])
         align('Triggers', statistics.statistics["triggers"]["count"])

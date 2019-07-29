@@ -12,9 +12,8 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-import sys
 import json
-from lambdaguard.utils.log import log, debug
+from lambdaguard.utils.log import debug
 from lambdaguard.core.AWS import AWS
 
 
@@ -36,6 +35,6 @@ class SQS(AWS):
             self.url = f'https://{self.arn.region}.queue.amazonaws.com/{self.arn.account_id}/{self.arn.resource}'
             policy = self.client.get_queue_attributes(QueueUrl=self.url, AttributeNames=['Policy'])
             if 'Attributes' in policy:
-                self.policy = json.loads(policy['Attributes']['Policy'])        
-        except:
+                self.policy = json.loads(policy['Attributes']['Policy'])
+        except Exception:
             debug(self.arn.full)

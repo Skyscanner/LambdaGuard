@@ -12,8 +12,6 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-import os
-import json
 from lambdaguard.utils.arnparse import arnparse
 from lambdaguard.core.S3 import S3
 from lambdaguard.core.SQS import SQS
@@ -34,7 +32,7 @@ class Scan:
         self.profile = args[0].profile
         self.access_key_id = args[0].keys[0]
         self.secret_access_key = args[0].keys[1]
-        self.security = { 'count': {}, 'items': [] }
+        self.security = {'count': {}, 'items': []}
 
         self.item = None  # item currently scanned
 
@@ -42,7 +40,7 @@ class Scan:
             self.sonarqube = SonarQube(self.args.sonarqube, self.args.output)
 
         self.scan()
-    
+
     def track(self, arn, item):
         '''
         Example: track('arn:...', {'level':'high','text':'...'})
@@ -53,7 +51,7 @@ class Scan:
         item['where'] = arn
         if self.item:
             item['where'] += f'\n\n{self.item.info}'
-        
+
         if item in self.security['items']:
             return  # Avoid duplicates
 
@@ -67,13 +65,13 @@ class Scan:
 
     def scan(self):
         '''
-        Scan Lambda report for vulnerabilities 
+        Scan Lambda report for vulnerabilities
         and provide recommendations.
         '''
         # Audit Function policy
         if not self.report['policy']['function']:
             self.track(self.report['arn'], {
-                'level': 'info', 
+                'level': 'info',
                 'text': 'Function policy is not defined'
             })
         else:
@@ -98,13 +96,13 @@ class Scan:
         # Audit Resources
         if 'logs' not in self.report['resources']['services']:
             self.track(self.report['arn'], {
-                'level': 'low', 
+                'level': 'low',
                 'text': 'Function activity is not monitored by CloudWatch due to missing logs permissions'
             })
 
         # Audit Triggers and Resources
         items = list(set(
-            list(self.report['triggers']['items'].keys()) + 
+            list(self.report['triggers']['items'].keys()) +
             list(self.report['resources']['items'].keys())
         ))
         for arn in items:

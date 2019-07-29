@@ -41,6 +41,7 @@ header = orange + f'''
 
 author = f'''\033[3;32mDeveloped by Artëm Tsvetkov{green}'''
 
+
 def parse_args(arguments=''):
     argsParser = argparse.ArgumentParser(description=author, usage=header, epilog=nocolor)
     inputArgs = argsParser.add_mutually_exclusive_group()
@@ -61,5 +62,6 @@ def parse_args(arguments=''):
 
     return args
 
+
 def align(key, value, color=green):
-    print(' '*10 + color + f'{key}'.ljust(15, '.') + f'{value}'.rjust(0, '.') + nocolor)
+    print(' ' * 10 + color + f'{key}'.ljust(15, '.') + f'{value}'.rjust(0, '.') + nocolor)

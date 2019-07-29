@@ -1,8 +1,13 @@
 install:
 	python3 setup.py install
 
-test:
+lint:
+	flake8 lambdaguard/
+
+unit:
 	python3 -m pytest -W ignore
+
+test: lint unit
 
 dev:
 	python3 -m venv dev

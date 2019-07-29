@@ -23,7 +23,7 @@ class VisibilityReport:
         self.index = {}
 
         self.path.joinpath('reports').mkdir(parents=True, exist_ok=True)
-    
+
     def save(self, report, verbose=False):
         idx = md5()
         idx.update(report['arn'].encode('utf-8'))

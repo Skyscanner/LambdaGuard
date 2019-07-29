@@ -12,7 +12,6 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-import re
 from lambdaguard.utils.arnparse import arnparse
 
 
@@ -22,12 +21,11 @@ class PolicyStatement:
         self.policy = policy
         self.vulnerabilities = []
         self.recommendations = []
-        
 
     def audit(self):
         if self.statement['Effect'] != 'Allow':
             return
-        
+
         # Where
         where = 'in Policy Statement'
         if self.policy:
@@ -35,7 +33,7 @@ class PolicyStatement:
         elif 'Sid' in self.statement:
             where = f'{where} Sid {self.statement["Sid"]}'
 
-        # Principal 
+        # Principal
         if self.is_unrestricted('Principal'):
             if self.is_undefined('Condition'):
                 yield {
@@ -135,8 +133,8 @@ class PolicyStatement:
         Example: unrestricted('Resource')
         '''
         matches = [
-            '*', ['*'], 
-            {'AWS': '*'}, {'AWS': ['*']}, 
+            '*', ['*'],
+            {'AWS': '*'}, {'AWS': ['*']},
             [{'AWS': '*'}], [{'AWS': ['*']}]
         ]
 
@@ -152,7 +150,7 @@ class PolicyStatement:
                     return True
             elif type(self.statement[idx]) == list:  # like sqs:*
                 for _ in self.statement[idx]:
-                    _ = _.split(':', 1)  
+                    _ = _.split(':', 1)
                     if len(_) > 1 and _[1] in matches:
                         return True
             elif type(self.statement[idx]) == dict:  # like {'AWS': ...}

@@ -12,7 +12,6 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-import sys
 import logging
 import traceback
 from pathlib import Path
@@ -28,8 +27,10 @@ def configure_log(path=''):
         filemode='w'
     )
 
+
 def log(data):
     logging.warning(data)
+
 
 def debug(arn):
     trace = traceback.format_exc()

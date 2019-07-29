@@ -12,9 +12,7 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-import sys
-import json
-from lambdaguard.utils.log import log, debug
+from lambdaguard.utils.log import debug
 from lambdaguard.core.AWS import AWS
 
 
@@ -34,5 +32,5 @@ class DynamoDB(AWS):
             table = self.client.describe_table(TableName=self.arn.resource)['Table']
             if 'SSEDescription' in table:
                 self.encryption = table['SSEDescription']
-        except:
+        except Exception:
             debug(self.arn.full)

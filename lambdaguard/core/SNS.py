@@ -12,9 +12,8 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-import sys
 import json
-from lambdaguard.utils.log import log, debug
+from lambdaguard.utils.log import debug
 from lambdaguard.core.AWS import AWS
 
 
@@ -32,5 +31,5 @@ class SNS(AWS):
             self.policy = json.loads(
                 self.client.get_topic_attributes(TopicArn=self.arn.full)['Attributes']['Policy']
             )
-        except:
+        except Exception:
             debug(self.arn.full)

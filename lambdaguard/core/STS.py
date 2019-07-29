@@ -12,10 +12,7 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-import sys
-import json
-from traceback import format_exc
-from lambdaguard.utils.log import log, debug
+from lambdaguard.utils.log import debug
 from lambdaguard.core.AWS import AWS
 
 
@@ -31,5 +28,5 @@ class STS(AWS):
         '''
         try:
             self.identity = self.client.get_caller_identity()
-        except:
+        except Exception:
             exit(print(debug(self.arn.full)))

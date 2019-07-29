@@ -23,7 +23,7 @@ class AWS(object):
     def __init__(self, arn, profile=None, access_key_id=None, secret_access_key=None):
         # AWS ARN
         self.arn = arnparse(arn)
-        
+
         # AWS Profile and Keys
         self.profile = profile
         self.access_key_id = access_key_id
@@ -38,7 +38,7 @@ class AWS(object):
         # AWS connection
         session = boto3.Session(profile_name=self.profile)
         self.client = session.client(
-            self.arn.service, 
+            self.arn.service,
             region_name=self.arn.region,
             aws_access_key_id=access_key_id,
             aws_secret_access_key=secret_access_key

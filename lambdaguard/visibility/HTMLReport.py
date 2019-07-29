@@ -15,7 +15,6 @@ specific language governing permissions and limitations under the License.
 import json
 from base64 import b64encode
 from pathlib import Path
-from collections import OrderedDict
 
 
 class HTMLReport:
@@ -42,7 +41,7 @@ class HTMLReport:
         # ===================================================== Statistics
         with self.path.joinpath('statistics.json').open() as f:
             stats_json = json.loads(f.read())
-        
+
         exclude_info = stats_json['lambdas'] > 1  # Exclude info level
 
         stats_table = assets_path.joinpath('stats.html').open().read()
@@ -51,7 +50,7 @@ class HTMLReport:
             if title in ['lambdas', 'regions', 'layers']:
                 continue
 
-            stats_table = stats_table.replace('{'+title+'_count}', str(data['count']))
+            stats_table = stats_table.replace('{' + title + '_count}', str(data['count']))
             stats_items = []
             for name, count in data['items'].items():
                 if exclude_info and name == 'info':
@@ -59,7 +58,7 @@ class HTMLReport:
                 stats_items.append(
                     stats_table_item.replace('{name}', name).replace('{count}', str(count))
                 )
-            stats_table = stats_table.replace('{'+title+'_items}', ''.join(stats_items))
+            stats_table = stats_table.replace('{' + title + '_items}', ''.join(stats_items))
         stats_table = stats_table.replace('{lambdas_count}', str(stats_json['lambdas']))
         stats_table = stats_table.replace('{layers_count}', str(stats_json['layers']))
 
@@ -67,7 +66,7 @@ class HTMLReport:
             report_html = report_html.replace('{highcharts}', f.read())
         with assets_path.joinpath('highcharts-theme.js').open() as f:
             report_html = report_html.replace('{highcharts-theme}', f.read())
-        
+
         with assets_path.joinpath('stats.js').open() as f:
             stats_template = f.read()
 
@@ -75,14 +74,14 @@ class HTMLReport:
         for title, data in stats_json.items():
             if title in ['lambdas', 'regions', 'layers']:
                 continue
-            
+
             series = []
             for name, y in data['items'].items():
                 if exclude_info and name == 'info':
                     data['count'] -= y
                     continue
                 series.append({'name': name, 'y': y})
-                
+
             chart = stats_template
             chart = chart.replace('{chartid}', f'stats-{title}')
             chart = chart.replace('{title}', f'{title} ({data["count"]})')
@@ -119,7 +118,7 @@ class HTMLReport:
             vulnlist_html = f.read()
 
         vulnlist_html = vulnlist_html.replace('{items}', vulns_html)
-        
+
         report_html = report_html.replace('{security}', vulnlist_html)
 
         vulns_json = None
@@ -134,7 +133,7 @@ class HTMLReport:
 
         with assets_path.joinpath('func.html').open() as f:
             func_html_template = f.read()
-        
+
         with assets_path.joinpath('funcvuln.html').open() as f:
             vuln_html_template = f.read()
 
@@ -143,14 +142,14 @@ class HTMLReport:
         for idx in index.keys():
             with self.path.joinpath('reports', f'{idx}.json').open() as f:
                 func = json.loads(f.read())
-            
+
             funcvuln_html = []
 
             for _ in func['security']['items']:
                 if exclude_info and _['level'] == 'info':
                     continue
                 ret = vuln_html_template.replace('{where}', self.txt2html(_['where']))
-                ret = ret.replace('{level}', _['level']) 
+                ret = ret.replace('{level}', _['level'])
                 ret = ret.replace('{text}', self.txt2html(_['text']))
                 funcvuln_html.append(ret)
 
@@ -200,7 +199,7 @@ class HTMLReport:
 
         for layer in all_layers:
             html = layer_html_template.replace('{arn}', layer['arn'])
-            html = html.replace('{description}', layer['description']) 
+            html = html.replace('{description}', layer['description'])
             html = html.replace('{runtime}', layer['runtime'])
             layer_html += f'{html}\n'
 

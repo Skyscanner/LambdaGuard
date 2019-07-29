@@ -12,9 +12,8 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-import sys
 import json
-from lambdaguard.utils.log import log, debug
+from lambdaguard.utils.log import debug
 from lambdaguard.core.AWS import AWS
 
 
@@ -41,7 +40,7 @@ class S3(AWS):
         try:
             policy = self.client.get_bucket_policy(Bucket=self.arn.resource)
             self.policy = json.loads(policy['Policy'])
-        except:
+        except Exception:
             debug(self.arn.full)
 
     def get_bucket_acl(self):
@@ -50,14 +49,14 @@ class S3(AWS):
         '''
         try:
             self.acl = self.client.get_bucket_acl(Bucket=self.arn.resource)
-        except:
+        except Exception:
             debug(self.arn.full)
-    
+
     def get_bucket_encryption(self):
         '''
         Fetches S3 Bucket encryption settings
         '''
         try:
             self.encryption = self.client.get_bucket_encryption(Bucket=self.arn.resource)
-        except:
+        except Exception:
             debug(self.arn.full)

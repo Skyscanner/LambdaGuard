@@ -26,6 +26,13 @@ the security perspective.
 https://github.com/Skyscanner/lambdaguard
 '''
 
+dev_requires = [
+    'pytest==3.6.0',
+    'flake8>=3.3.0',
+    'pytest-cov>=2.5.1',
+    'pip-tools==2.0.2'
+]
+
 setuptools.setup(
     name='lambdaguard',
     version=version,
@@ -34,7 +41,7 @@ setuptools.setup(
     description='LambdaGuard',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='https://github.com/Skyscanner/lambdaguard',
+    url='https://github.com/Skyscanner/LambdaGuard',
     packages=setuptools.find_packages(),
     include_package_data=True,
     install_requires=[
@@ -42,5 +49,8 @@ setuptools.setup(
         'argparse',
         'requests'
     ],
+    extras_require={
+        'dev': dev_requires,
+    },
     scripts=['bin/lambdaguard']
 )

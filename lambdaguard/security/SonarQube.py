@@ -37,6 +37,7 @@ sonar.java.binaries=.
 sonar.tests=
 '''
 
+
 class SonarQube:
     def __init__(self, config, output):
         config = Path(config)

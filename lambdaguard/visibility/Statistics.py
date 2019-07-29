@@ -23,11 +23,11 @@ class Statistics:
         self.statistics = {
             'lambdas': 0,
             'layers': 0,
-            'regions': { 'count': 0, 'items': {} },
-            'runtimes': { 'count': 0, 'items': {} },
-            'triggers': { 'count': 0, 'items': {} },
-            'resources': { 'count': 0, 'items': {} },
-            'security': { 'count': 0, 'items': {} }
+            'regions': {'count': 0, 'items': {}},
+            'runtimes': {'count': 0, 'items': {}},
+            'triggers': {'count': 0, 'items': {}},
+            'resources': {'count': 0, 'items': {}},
+            'security': {'count': 0, 'items': {}}
         }
 
     def track(self, idx, value, count=1):

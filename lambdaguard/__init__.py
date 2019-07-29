@@ -61,6 +61,13 @@ def get_functions(args):
 
 def run(arguments=''):
     args = parse_args(arguments)
+
+    if args.html:
+        HTMLReport(args.output).save()
+        if args.verbose:
+            print(f'HTML report saved to {args.output}/report.html')
+        exit(0)
+
     rmtree(args.output, ignore_errors=True)
     Path(args.output).mkdir(parents=True, exist_ok=True)
     configure_log(args.output)
@@ -93,6 +100,7 @@ def run(arguments=''):
         align('Security', statistics.statistics["security"]["count"])
         align('Triggers', statistics.statistics["triggers"]["count"])
         align('Resources', statistics.statistics["resources"]["count"])
+        align('Layers', statistics.statistics["layers"])
         align('Runtimes', len(statistics.statistics["runtimes"]["items"]))
         align('Regions', len(statistics.statistics["regions"]["items"]))
         align('Report', f'{args.output}/report.html')

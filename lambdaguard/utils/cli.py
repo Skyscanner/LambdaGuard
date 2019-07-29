@@ -48,6 +48,7 @@ def parse_args(arguments=''):
     inputArgs.add_argument('-f', '--function', default=None, help='Lambda ARN')
     inputArgs.add_argument('-i', '--input', default=None, help='Input file with a list of ARNs')
     argsParser.add_argument('-o', '--output', default='lambdaguard_output', help='Output directory')
+    argsParser.add_argument('-H', '--html', action='store_true', help='Generate HTML report and quit')
     awsArgs = argsParser.add_mutually_exclusive_group()
     awsArgs.add_argument('-p', '--profile', default=None, help='AWS profile')
     awsArgs.add_argument('-k', '--keys', nargs=2, metavar=('ID', 'SECRET'), default=[None, None], help='AWS keys: AccessKeyId SecretAccessKey')

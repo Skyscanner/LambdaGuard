@@ -30,6 +30,7 @@ class Lambda(AWS):
         self.args = args[0]
         self.runtime = None
         self.handler = None
+        self.layers = None
         self.description = None
         self.role = None
         self.codeURL = None
@@ -70,6 +71,15 @@ class Lambda(AWS):
                 secret_access_key=self.secret_access_key
             )
             self.codeURL = function['Code']['Location']
+            self.layers = []
+            if 'Layers' in config:
+                for layer in config['Layers']:
+                    layer = self.client.get_layer_version_by_arn(Arn=layer['Arn'])
+                    self.layers.append({
+                        'arn': layer['LayerVersionArn'],
+                        'description': layer['Description'],
+                        'codeURL': layer['Content']['Location']
+                    })
         except:
             debug(self.arn.full)
 
@@ -170,6 +180,7 @@ class Lambda(AWS):
             'region': self.arn.region,
             'runtime': self.runtime,
             'handler': self.handler,
+            'layers': self.layers,
             'codeURL': self.codeURL,
             'role': self.role.arn.full,
             'policy': {

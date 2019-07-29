@@ -47,10 +47,8 @@ class SonarQube:
 
     def __del__(self):
         rmtree(self.downloads, ignore_errors=True)
-        pass
 
-    def scan(self, codeURL, handler, runtime):
-        codepath = handler.split(".")[0]
+    def scan(self, codeURL, runtime):
         zippath = self.downloads.joinpath('lambda.zip')
         zippath.write_bytes(requests.get(codeURL).content)
         if not is_zipfile(zippath):
@@ -59,8 +57,7 @@ class SonarQube:
 
         # Unzip Lambda source code
         for _ in zf.namelist():
-            if _.startswith(codepath):
-                zf.extractall(self.downloads, members=[_])
+            zf.extractall(self.downloads, members=[_])
 
         # Configure sonar-project.properties
         if runtime.startswith('python'):
@@ -85,6 +82,8 @@ class SonarQube:
         cd(self.downloads)
         sh(shsplit(self.config['command']), stdout=DEVNULL, stderr=DEVNULL)
         cd(cwd)
+        rmtree(self.downloads, ignore_errors=True)
+        self.downloads.mkdir(parents=True, exist_ok=True)
 
         # Get results
         curl = requests.Session()

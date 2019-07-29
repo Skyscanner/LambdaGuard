@@ -126,7 +126,9 @@ class HTMLReport:
         vulns_html = None
         vulnlist_html = None
 
-        # ===================================================== Functions 
+        # ===================================================== Functions & Layers
+        all_layers = []
+
         with self.path.joinpath('index.json').open() as f:
             index = json.loads(f.read())
 
@@ -155,6 +157,9 @@ class HTMLReport:
             layers = []
             for layer in func['layers']:
                 layers.append(f"{layer['arn']} ({layer['description']})")
+                layer.update({'runtime': func['runtime']})
+                if layer not in all_layers:
+                    all_layers.append(layer)
 
             html = func_html_template
             html = html.replace('{index}', idx)
@@ -187,6 +192,27 @@ class HTMLReport:
 
         funcs_html = None
         funclist_html = None
+
+        with assets_path.joinpath('layer.html').open() as f:
+            layer_html_template = f.read()
+
+        layer_html = ''
+
+        for layer in all_layers:
+            html = layer_html_template.replace('{arn}', layer['arn'])
+            html = html.replace('{description}', layer['description']) 
+            html = html.replace('{runtime}', layer['runtime'])
+            layer_html += f'{html}\n'
+
+        with assets_path.joinpath('layerlist.html').open() as f:
+            layerlist_html = f.read()
+
+        layerlist_html = layerlist_html.replace('{items}', layer_html)
+
+        report_html = report_html.replace('{layers}', layerlist_html)
+
+        layer_html = None
+        layerlist_html = None
 
         # ===================================================== HTML
 

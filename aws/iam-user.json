@@ -1,0 +1,31 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+        "LambdaGuardUser": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "UserName": "LambdaGuardUser",
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/ReadOnlyAccess"
+                ]
+            }
+        },
+        "AccessKeys": {
+            "Type": "AWS::IAM::AccessKey",
+            "Properties": {
+                "UserName": {"Ref": "LambdaGuardUser"}
+            }
+        }
+    },
+    "Outputs": {
+        "aws_access_key_id": {
+            "Value": {"Ref": "AccessKeys"}
+        },
+        "aws_secret_access_key": {
+            "Value": {"Fn::GetAtt": [
+                "AccessKeys",
+                "SecretAccessKey"
+            ]}
+        }
+    }
+}

@@ -17,7 +17,17 @@ install-dev:
 	python3 setup.py develop
 	pip3 install pytest
 
+aws:
+	aws cloudformation deploy \
+		--stack-name LambdaGuard \
+		--capabilities CAPABILITY_NAMED_IAM \
+		--template-file aws/iam-user.json
+	aws cloudformation describe-stacks \
+		--stack-name LambdaGuard \
+		--query "Stacks[0].Outputs"
+
 clean:
+	aws cloudformation delete-stack --stack-name LambdaGuard
 	set -e
 	find . -iname "dist" -exec rm -rf {} \;
 	find . -iname "build" -exec rm -rf {} \;

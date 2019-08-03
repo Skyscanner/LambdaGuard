@@ -88,7 +88,7 @@ class PolicyStatement:
                 yield {
                     'level': 'low',
                     'text': f'Unrestricted Action {action} {where}\nhttps://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege'
-                }        
+                }
 
         # NotAction
         if self.get('NotAction'):

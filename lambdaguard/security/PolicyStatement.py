@@ -12,6 +12,7 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
+from lambdaguard.security.PrivilegeEscalation import PrivilegeEscalation
 from lambdaguard.utils.arnparse import arnparse
 
 
@@ -87,7 +88,7 @@ class PolicyStatement:
                 yield {
                     'level': 'low',
                     'text': f'Unrestricted Action {action} {where}\nhttps://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege'
-                }
+                }        
 
         # NotAction
         if self.get('NotAction'):
@@ -113,6 +114,9 @@ class PolicyStatement:
                 'level': 'info',
                 'text': f'Use Customer Managed policies instead of Inline policies {where}'
             }
+
+        # Privilege Escalation via IAM permissions
+        yield from PrivilegeEscalation(self.get('Action')).audit()
 
     def get(self, idx):
         '''

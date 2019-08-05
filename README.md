@@ -22,12 +22,25 @@ cd lambdaguard
 sudo make install
 ```
 
+### AWS Access
+You will need a set of AWS access keys and permissions to run LambdaGuard.
+```
+make aws
+```
+Create a profile in `~/.aws/credentials` with the newly created keys. 
+```
+[LambdaGuardProfile]
+aws_access_key_id = ...
+aws_secret_access_key = ...
+```
+Alternatively, you can use the keys directly as CLI arguments (not recommended).
+
 ## Run
 - `lambdaguard --help`
 - `lambdaguard --function arn:aws:lambda:function`
 - `lambdaguard --input function-arns.txt`
 - `lambdaguard --output /tmp/lambdaguard`
-- `lambdaguard --profile aws-profile`
+- `lambdaguard --profile LambdaGuardProfile`
 - `lambdaguard --keys ACCESS_KEY_ID SECRET_ACCESS_KEY`
 - `lambdaguard --region eu-west-1`
 - `lambdaguard --verbose`
@@ -53,7 +66,7 @@ Config should have the following format:
 
 ## Development
 ```
-make -i clean
+make -B clean
 make dev
 . dev/bin/activate
 make install-dev

@@ -15,7 +15,7 @@ dev:
 
 install-dev:
 	python3 setup.py develop
-	pip3 install pytest
+	pip3 install pytest wheel twine
 
 aws:
 	aws cloudformation deploy \

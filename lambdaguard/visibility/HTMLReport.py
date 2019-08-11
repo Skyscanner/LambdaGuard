@@ -50,7 +50,12 @@ class HTMLReport:
             if title in ['lambdas', 'regions', 'layers']:
                 continue
 
-            stats_table = stats_table.replace('{' + title + '_count}', str(data['count']))
+            if exclude_info and title == 'security':
+                count = data['count'] - data['items']['info']
+            else:
+                count = data['count']
+            stats_table = stats_table.replace('{' + title + '_count}', str(count))
+
             stats_items = []
             for name, count in data['items'].items():
                 if exclude_info and name == 'info':

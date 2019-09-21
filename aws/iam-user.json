@@ -18,10 +18,10 @@
         }
     },
     "Outputs": {
-        "aws_access_key_id": {
+        "awsAccessKeyId": {
             "Value": {"Ref": "AccessKeys"}
         },
-        "aws_secret_access_key": {
+        "awsSecretAccessKey": {
             "Value": {"Fn::GetAtt": [
                 "AccessKeys",
                 "SecretAccessKey"

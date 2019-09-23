@@ -17,6 +17,7 @@ from lambdaguard.utils.arnparse import arnparse
 from lambdaguard.utils.log import debug
 from lambdaguard.core.AWS import AWS
 from lambdaguard.core.Role import Role
+from lambdaguard.core.KMS import KMS
 from lambdaguard.security.Scan import Scan
 
 
@@ -30,6 +31,7 @@ class Lambda(AWS):
         self.layers = None
         self.description = None
         self.role = None
+        self.kms = None
         self.codeURL = None
         self.triggers = {'services': [], 'items': {}}
         self.resources = {'services': [], 'items': {}}
@@ -61,6 +63,13 @@ class Lambda(AWS):
             self.runtime = config['Runtime']
             self.handler = config['Handler']
             self.description = config['Description']
+            if 'KMSKeyArn' in config:
+                self.kms = KMS(
+                    config['KMSKeyArn'],
+                    profile=self.profile,
+                    access_key_id=self.access_key_id,
+                    secret_access_key=self.secret_access_key
+                )
             self.role = Role(
                 config['Role'],
                 profile=self.profile,
@@ -190,4 +199,7 @@ class Lambda(AWS):
             'resources': self.resources,
             'security': self.security
         }
+        if self.kms:
+            ret['kms'] = self.kms.arn.full
+            ret['policy']['kms'] = self.kms.policies
         return ret

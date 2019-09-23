@@ -84,7 +84,7 @@ class PolicyStatement:
 
         # Action
         for action in self.get('Action'):
-            if '*' in action:
+            if action == '*' or action.split(':')[1] == '*':
                 yield {
                     'level': 'low',
                     'text': f'Unrestricted Action {action} {where}\nhttps://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege'

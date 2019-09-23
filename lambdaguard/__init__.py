@@ -16,6 +16,7 @@ import boto3
 from pathlib import Path
 from shutil import rmtree
 from lambdaguard.utils.arnparse import arnparse
+from lambdaguard.utils.log import debug
 from lambdaguard.utils.cli import parse_args, align, header, nocolor, green, orange
 from lambdaguard.utils.log import configure_log
 from lambdaguard.core.Lambda import Lambda
@@ -90,6 +91,8 @@ def run(arguments=''):
             lmbd = Lambda(arn.full, args)
             statistics.parse(lmbd.report())
             visibility.save(lmbd.report())
+        else:
+            debug(f'Invalid ARN "{arn}"')
 
     SecurityReport(args.output).save()
     HTMLReport(args.output).save()
@@ -103,5 +106,5 @@ def run(arguments=''):
         align('Layers', statistics.statistics["layers"])
         align('Runtimes', len(statistics.statistics["runtimes"]["items"]))
         align('Regions', len(statistics.statistics["regions"]["items"]))
-        align('Report', f'{args.output}/report.html')
+        # align('Report', f'{args.output}/report.html')
         print('\n')

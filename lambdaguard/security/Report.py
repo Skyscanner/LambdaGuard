@@ -21,6 +21,9 @@ class SecurityReport:
         self.path = Path(path)
 
     def save(self):
+        if not self.path.joinpath('index.json').exists():
+            return
+
         OUT = []
 
         with self.path.joinpath('index.json').open() as f:

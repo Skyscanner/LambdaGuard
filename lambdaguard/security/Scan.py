@@ -18,6 +18,7 @@ from lambdaguard.core.SQS import SQS
 from lambdaguard.core.SNS import SNS
 from lambdaguard.core.APIGateway import APIGateway
 from lambdaguard.core.DynamoDB import DynamoDB
+from lambdaguard.core.KMS import KMS
 from lambdaguard.security.PolicyStatement import PolicyStatement
 from lambdaguard.security.AccessControlList import AccessControlList
 from lambdaguard.security.Encryption import Encryption
@@ -93,6 +94,22 @@ class Scan:
                         for _ in PolicyStatement(statement, policy=policy).audit():
                             self.track(self.report['role'], _)
 
+        # Audit KMS
+        if 'kms' in self.report:
+            self.item = KMS(
+                self.report['kms'],
+                profile=self.profile,
+                access_key_id=self.access_key_id,
+                secret_access_key=self.secret_access_key
+            )
+            if not self.item.rotation:
+                self.track(self.report['kms'], {
+                    'level': 'medium',
+                    'text': 'Automatic rotation of key material is disabled\nhttps://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html'
+                })
+            for _, policy in self.item.policies.items():
+                self.audit_policy_statements(self.item.arn, policy)
+
         # Audit Resources
         if 'logs' not in self.report['resources']['services']:
             self.track(self.report['arn'], {
@@ -155,15 +172,23 @@ class Scan:
                     access_key_id=self.access_key_id,
                     secret_access_key=self.secret_access_key
                 )
+            elif arn.service == 'kms':
+                self.item = KMS(
+                    arn.full,
+                    profile=self.profile,
+                    access_key_id=self.access_key_id,
+                    secret_access_key=self.secret_access_key
+                )
 
             if self.item:
-                # Audit item Resource-based Policy
-                if 'Statement' in self.item.policy:
-                    for statement in self.item.policy['Statement']:
-                        for _ in PolicyStatement(statement).audit():
-                            self.track(arn.full, _)
-                # If policy is missing, the the service is public
+                if type(self.item) == KMS:
+                    # Audit KMS Policies
+                    for _, policy in self.item.policies.items():
+                        self.audit_policy_statements(self.item.arn, policy)
                 else:
+                    # Audit item Resource-based Policy
+                    self.audit_policy_statements(self.item.arn, self.item.policy)
+                    # If policy is missing, then the service is public
                     for _ in Public(self.item).audit():
                         self.track(arn.full, _)
 
@@ -189,6 +214,12 @@ class Scan:
                     if item not in sorted_items:
                         sorted_items.append(item)
         self.security['items'] = sorted_items
+
+    def audit_policy_statements(self, arn, policy):
+        if 'Statement' in policy:
+            for statement in policy['Statement']:
+                for _ in PolicyStatement(statement).audit():
+                    self.track(arn.full, _)
 
     def scan_sonarqube(self, arn, codeURL, runtime):
         for _ in self.sonarqube.scan(codeURL, runtime):

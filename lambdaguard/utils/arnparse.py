@@ -54,6 +54,8 @@ def arnparse(arn_str):
             if len(elements[5].split('/')) > 1:
                 resource_type = elements[5].split('/', 1)[1]  # objects
             resource = elements[5].split('/')[0]  # bucket name
+        elif service == 'kms':
+            resource_type = elements[5].split('/')[0]
         elif '/' in resource:
             resource_type, resource = resource.split('/', 1)
         elif ':' in resource:

@@ -39,6 +39,8 @@ class HTMLReport:
             report_html = report_html.replace('{logo}', str(logo))
 
         # ===================================================== Statistics
+        if not self.path.joinpath('statistics.json').exists():
+            return
         with self.path.joinpath('statistics.json').open() as f:
             stats_json = json.loads(f.read())
 
@@ -184,6 +186,12 @@ class HTMLReport:
             html = html.replace('{security_count}', str(len(funcvuln_html)))
             html = html.replace('{policy}', json.dumps(func['policy']['function'], indent=4))
             html = html.replace('{role_policy}', json.dumps(func['policy']['role'], indent=4))
+            if 'kms' in func:
+                html = html.replace('{kms}', func['kms'])
+                html = html.replace('{kms_policies}', json.dumps(func['policy']['kms'], indent=4))
+            else:
+                html = html.replace('{kms}', '')
+                html = html.replace('{kms_policies}', '{}')
 
             funcs_html += f'{html}\n'
 

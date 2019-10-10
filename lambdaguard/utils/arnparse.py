@@ -49,7 +49,8 @@ def arnparse(arn_str):
     if service not in ['sns', 'apigateway']:
         if service == 'dynamodb':
             resource_type = elements[5].split('/')[0]  # table
-            resource = elements[5].split('/')[1]  # table name
+            if len(elements[5].split('/')) > 1:
+                resource = elements[5].split('/')[1]  # table name
         elif service == 's3':
             if len(elements[5].split('/')) > 1:
                 resource_type = elements[5].split('/', 1)[1]  # objects

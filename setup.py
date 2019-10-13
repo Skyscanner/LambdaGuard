@@ -37,7 +37,9 @@ dev_requires = [
     'flake8>=2.5.4',
     'pytest>=2.9.1',
     'pytest-mock>=1.0',
-    'pip-tools'
+    'pip-tools',
+    'wheel',
+    'twine'
 ]
 
 setup(

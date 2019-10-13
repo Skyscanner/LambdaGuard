@@ -14,7 +14,10 @@ specific language governing permissions and limitations under the License.
 """
 import argparse
 from pathlib import Path
+from os import environ
 
+
+environ['PYTHONIOENCODING'] = 'UTF-8'
 
 __version__ = Path(__file__).parents[1].joinpath('version.txt').read_text()
 
@@ -39,7 +42,7 @@ header = orange + f'''
       ./osssssssssssso/.
          `.-:////:-.`''' + nocolor
 
-author = f'''\033[3;32mDeveloped by Artëm Tsvetkov{green}'''
+author = f'\033[3;32mDeveloped by Artëm Tsvetkov{green}'
 
 
 def parse_args(arguments=''):

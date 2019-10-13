@@ -13,6 +13,7 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 from lambdaguard.utils.arnparse import arnparse
+from lambdaguard.utils.log import debug
 from lambdaguard.core.S3 import S3
 from lambdaguard.core.SQS import SQS
 from lambdaguard.core.SNS import SNS
@@ -38,7 +39,11 @@ class Scan:
         self.item = None  # item currently scanned
 
         if self.args.sonarqube:
-            self.sonarqube = SonarQube(self.args.sonarqube, self.args.output)
+            try:
+                self.sonarqube = SonarQube(self.args.sonarqube, self.args.output)
+            except Exception:
+                debug('Invalid SonarQube configuration')
+                self.args.sonarqube = None  # disable SonarQube
 
         self.scan()
 

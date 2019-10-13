@@ -40,16 +40,20 @@ sonar.tests=
 
 class SonarQube:
     def __init__(self, config, output):
-        config = Path(config)
-        assert config.exists()
-        self.config = json.loads(config.read_text())
         self.downloads = Path(output, 'downloads')
         self.downloads.mkdir(parents=True, exist_ok=True)
+        config = Path(config)
+        if config.exists():
+            self.config = json.loads(config.read_text())
+        else:
+            raise FileNotFoundError('SonarQube config file not found: {}'.format(config))
 
     def __del__(self):
         rmtree(self.downloads, ignore_errors=True)
 
     def scan(self, codeURL, runtime):
+        if not self.config:
+            return  # invalid config
         zippath = self.downloads.joinpath('lambda.zip')
         zippath.write_bytes(requests.get(codeURL).content)
         if not is_zipfile(zippath):

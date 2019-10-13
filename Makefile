@@ -1,21 +1,25 @@
 install:
-	python3 setup.py install
+	pip3 install -e .
 
-lint:
-	flake8 lambdaguard/
-
-unit:
-	python3 -m pytest -W ignore
-
-test: lint unit
+install-dev:
+	pip3 install -e ".[dev]"
 
 dev:
 	python3 -m venv dev
 	echo "\nNow run: \n\n. dev/bin/activate\n"
 
-install-dev:
-	python3 setup.py develop
-	pip3 install pytest wheel twine
+lint:
+	flake8 lambdaguard/
+
+unit:
+	pytest --show-capture=all -v tests/unit
+
+coverage:
+	coverage run --source=lambdaguard/ --branch -m pytest tests/unit --junitxml=build/test.xml -v
+	coverage xml -i -o build/coverage.xml
+	coverage report
+
+test: lint unit
 
 aws:
 	aws cloudformation deploy \

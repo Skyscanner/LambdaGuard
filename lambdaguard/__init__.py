@@ -106,5 +106,7 @@ def run(arguments=''):
         align('Layers', statistics.statistics["layers"])
         align('Runtimes', len(statistics.statistics["runtimes"]["items"]))
         align('Regions', len(statistics.statistics["regions"]["items"]))
-        # align('Report', f'{args.output}/report.html')
+        print('')
+        align('Report', f'{args.output}/report.html')
+        align('Log', f'{args.output}/lambdaguard.log')
         print('\n')

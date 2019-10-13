@@ -23,7 +23,7 @@ from lambdaguard.security.Encryption import Encryption
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.fixtures = Path(__file__).parent.joinpath('fixtures')
+        cls.fixtures = Path(__file__).parents[1].joinpath('fixtures')
 
     def test_encryption_ok(self):
         expected = StopIteration
@@ -45,7 +45,7 @@ class Test(unittest.TestCase):
         }
         
         arn = 'arn:aws:s3::0:bucket'
-        self.assertEquals(expected, next(Encryption(S3(arn)).audit()))
+        self.assertEqual(expected, next(Encryption(S3(arn)).audit()))
 
         arn = 'arn:aws:dynamodb:eu-west-1:0:table/name'
-        self.assertEquals(expected, next(Encryption(DynamoDB(arn)).audit()))
+        self.assertEqual(expected, next(Encryption(DynamoDB(arn)).audit()))

@@ -34,5 +34,7 @@ def log(data):
 
 def debug(arn):
     trace = traceback.format_exc()
+    if trace == 'NoneType: None\n':
+        trace = ''
     logging.error(f'[{arn}]\n{trace}')
     return trace

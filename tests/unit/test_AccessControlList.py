@@ -21,7 +21,7 @@ from lambdaguard.security.AccessControlList import AccessControlList
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.fixtures = Path(__file__).parent.joinpath('fixtures')
+        cls.fixtures = Path(__file__).parents[1].joinpath('fixtures')
 
     def test_ok(self):
         acl = json.loads(self.fixtures.joinpath('AccessControlListOk.json').read_text())
@@ -35,7 +35,7 @@ class Test(unittest.TestCase):
             'level': 'info', 
             'text': 'Bucket ACL is not defined'
         }
-        self.assertEquals(expected, next(AccessControlList(acl).audit()))
+        self.assertEqual(expected, next(AccessControlList(acl).audit()))
 
     def test_public(self):
         acl = json.loads(self.fixtures.joinpath('AccessControlListPublic.json').read_text())
@@ -45,19 +45,19 @@ class Test(unittest.TestCase):
             'level': 'high',
             'text': 'Public Bucket ACL: READ access for Everyone'
         }
-        self.assertEquals(expected, next(result))
+        self.assertEqual(expected, next(result))
 
         expected = {
             'level': 'high',
             'text': 'Public Bucket ACL: WRITE access for Everyone'
         }
-        self.assertEquals(expected, next(result))
+        self.assertEqual(expected, next(result))
 
         expected = {
             'level': 'high',
             'text': 'Public Bucket ACL: FULL_CONTROL access for Authenticated AWS users'
         }
-        self.assertEquals(expected, next(result))
+        self.assertEqual(expected, next(result))
 
 
 if __name__ == '__main__':

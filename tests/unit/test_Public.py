@@ -22,7 +22,7 @@ from lambdaguard.security.Public import Public
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.fixtures = Path(__file__).parent.joinpath('fixtures')
+        cls.fixtures = Path(__file__).parents[1].joinpath('fixtures')
 
     def test_public_ok(self):
         expected = StopIteration
@@ -37,4 +37,4 @@ class Test(unittest.TestCase):
             'level': 'high',
             'text': 'Service is publicly accessible due to missing Resource-based policy'
         }
-        self.assertEquals(expected, next(Public(APIGateway(arn)).audit()))
+        self.assertEqual(expected, next(Public(APIGateway(arn)).audit()))

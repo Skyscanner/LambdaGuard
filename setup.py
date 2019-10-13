@@ -12,7 +12,7 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-import setuptools
+from setuptools import setup, find_packages
 from pathlib import Path
 
 
@@ -23,34 +23,41 @@ and provide actionable results. It provides a meaningful overview in terms of
 statistical analysis, AWS service dependencies and configuration checks from 
 the security perspective.
 
-https://github.com/Skyscanner/lambdaguard
+https://github.com/Skyscanner/LambdaGuard
 '''
 
-dev_requires = [
-    'pytest==3.6.0',
-    'flake8>=3.3.0',
-    'pytest-cov>=2.5.1',
-    'pip-tools==2.0.2'
+install_requires=[
+    'boto3',
+    'argparse',
+    'requests'
 ]
 
-setuptools.setup(
-    name='lambdaguard',
+dev_requires = [
+    'coverage~=4.4',
+    'flake8>=2.5.4',
+    'pytest>=2.9.1',
+    'pytest-mock>=1.0',
+    'pip-tools'
+]
+
+setup(
+    name='LambdaGuard',
     version=version,
     author='Artëm Tsvetkov',
     author_email='artem.tsvetkov@skyscanner.net',
     description='LambdaGuard',
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type='text/markdown',
     url='https://github.com/Skyscanner/LambdaGuard',
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     include_package_data=True,
-    install_requires=[
-        'boto3',
-        'argparse',
-        'requests'
-    ],
+    setup_requires=['pytest-runner'],
+    install_requires=install_requires,
+    tests_require=dev_requires,
     extras_require={
         'dev': dev_requires,
     },
-    scripts=['bin/lambdaguard']
+    entry_points={
+        "console_scripts": ["lambdaguard=lambdaguard:run"],
+    }
 )

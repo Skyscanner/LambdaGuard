@@ -82,9 +82,9 @@ def run(arguments=''):
     statistics = Statistics(args.output)
     visibility = VisibilityReport(args.output)
 
-    for arn in get_functions(args):
+    for arn_str in get_functions(args):
         try:
-            arn = arnparse(arn)
+            arn = arnparse(arn_str)
             if args.verbose:
                 count = '[' + f'{statistics.statistics["lambdas"]+1}'.rjust(4, ' ') + '] '
                 print(f'\r{green}{count}{arn.resource}{nocolor}'.ljust(100, ' '), end='')
@@ -92,7 +92,7 @@ def run(arguments=''):
             statistics.parse(lmbd.report())
             visibility.save(lmbd.report())
         except Exception:
-            debug(arn)
+            debug(arn_str)
 
     SecurityReport(args.output).save()
     HTMLReport(args.output).save()

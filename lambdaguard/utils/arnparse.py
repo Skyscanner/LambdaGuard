@@ -15,7 +15,7 @@ specific language governing permissions and limitations under the License.
 
 
 class ARN(object):
-    def __init__(self, full, partition, service, region, account_id, resource_type, resource):
+    def __init__(self, full, partition=None, service=None, region=None, account_id=None, resource_type=None, resource=None):
         self.full = full
         self.partition = partition
         self.service = service
@@ -23,6 +23,17 @@ class ARN(object):
         self.account_id = account_id
         self.resource_type = resource_type
         self.resource = resource
+
+    def to_dict(self):
+        return {
+            'full': self.full,
+            'partition': self.partition,
+            'service': self.service,
+            'region': self.region,
+            'account_id': self.account_id,
+            'resource_type': self.resource_type,
+            'resource': self.resource
+        }
 
 
 def empty_str_to_none(str_):
@@ -33,8 +44,8 @@ def empty_str_to_none(str_):
 
 def arnparse(arn_str):
     # https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
-    if not arn_str.startswith('arn:'):
-        return None
+    if not arn_str.startswith('arn:') or len(arn_str.split(':')) < 4:
+        raise ValueError('Invalid ARN format: {}'.format(arn_str))
 
     elements = arn_str.split(':', 5)
     elements += [''] * (6 - len(elements))
@@ -46,20 +57,27 @@ def arnparse(arn_str):
     if service == 'execute-api':
         service = 'apigateway'
 
-    if service not in ['sns', 'apigateway']:
-        if service == 'dynamodb':
-            resource_type = elements[5].split('/')[0]  # table
-            resource = elements[5].split('/')[1]  # table name
-        elif service == 's3':
-            if len(elements[5].split('/')) > 1:
-                resource_type = elements[5].split('/', 1)[1]  # objects
-            resource = elements[5].split('/')[0]  # bucket name
-        elif service == 'kms':
-            resource_type = elements[5].split('/')[0]
-        elif '/' in resource:
-            resource_type, resource = resource.split('/', 1)
-        elif ':' in resource:
-            resource_type, resource = resource.split(':', 1)
+    if service == 'iam':
+        resource_type = '/'.join(elements[5].split('/')[:-1])  # role type
+    elif service == 'dynamodb':
+        resource_type = elements[5].split('/')[0]  # table
+        resource = elements[5].split('/')[1]  # table name
+    elif service == 's3':
+        if len(elements[5].split('/')) > 1:
+            resource_type = elements[5].split('/', 1)[1]  # objects
+        resource = elements[5].split('/')[0]  # bucket name
+    elif service == 'kms':
+        resource_type = elements[5].split('/')[0]
+    elif service == 'logs':
+        resource_type = elements[5].split(':')[0]
+        resource = ':'.join(elements[5].split(':')[1:])
+    elif service == 'apigateway':
+        resource_type, *resource = elements[5].split('/')
+        resource = '/'.join(resource)
+    elif '/' in resource:
+        resource_type, resource = resource.split('/', 1)
+    elif ':' in resource:
+        resource_type, resource = resource.split(':', 1)
 
     return ARN(
         full=arn_str,
@@ -68,5 +86,5 @@ def arnparse(arn_str):
         region=empty_str_to_none(elements[3]),
         account_id=empty_str_to_none(elements[4]),
         resource_type=resource_type,
-        resource=resource,
+        resource=resource
     )

@@ -83,7 +83,7 @@ def run(arguments=''):
     visibility = VisibilityReport(args.output)
 
     for arn in get_functions(args):
-        if arnparse(arn):
+        try:
             arn = arnparse(arn)
             if args.verbose:
                 count = '[' + f'{statistics.statistics["lambdas"]+1}'.rjust(4, ' ') + '] '
@@ -91,8 +91,8 @@ def run(arguments=''):
             lmbd = Lambda(arn.full, args)
             statistics.parse(lmbd.report())
             visibility.save(lmbd.report())
-        else:
-            debug(f'Invalid ARN "{arn}"')
+        except Exception:
+            debug(arn)
 
     SecurityReport(args.output).save()
     HTMLReport(args.output).save()

@@ -14,6 +14,8 @@ specific language governing permissions and limitations under the License.
 """
 import logging
 import traceback
+from sys import exc_info
+from botocore.exceptions import ClientError
 from pathlib import Path
 
 
@@ -33,8 +35,16 @@ def log(data):
 
 
 def debug(arn):
+    exc_type, exc_value, exc_traceback = exc_info()
+    exc_value = str(exc_value)
     trace = traceback.format_exc()
     if trace == 'NoneType: None\n':
-        trace = ''
+        return None  # Empty
+    elif exc_type == ClientError:
+        if 'arn:aws:lambda:::awslayer:' in exc_value:
+            return None  # Update opt-in/out
+    elif exc_type == ValueError:
+        if 'Invalid endpoint:' in exc_value:
+            return None  # Invalid resource configuration
     logging.error(f'[{arn}]\n{trace}')
     return trace

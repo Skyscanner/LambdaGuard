@@ -129,6 +129,6 @@ def align(key, value, color=green):
         ' ' * 10 +
         color +
         f'{key}'.ljust(15, '.') +
-        f'{value}'.rjust(0, '.') +
+        f' {value}'.rjust(0, '.') +
         nocolor
     )

@@ -19,11 +19,13 @@ from lambdaguard.utils.arnparse import arnparse
 from lambdaguard.utils.log import debug
 from lambdaguard.utils.cli import parse_args, align, header, nocolor, green, orange
 from lambdaguard.utils.log import configure_log
+from lambdaguard.utils.paginator import paginate
 from lambdaguard.core.Lambda import Lambda
 from lambdaguard.core.STS import STS
 from lambdaguard.visibility.Statistics import Statistics
 from lambdaguard.visibility.Report import VisibilityReport
 from lambdaguard.visibility.HTMLReport import HTMLReport
+from lambdaguard.visibility.LambdaWrite import LambdaWrite
 from lambdaguard.security.Report import SecurityReport
 
 
@@ -43,25 +45,18 @@ def get_functions(args):
             aws_secret_access_key=args.keys[1],
             region_name=args.region
         ).client('lambda')
-        marker = None
-        while True:
-            pages = client.get_paginator('list_functions').paginate(
-                PaginationConfig={
-                    'MaxItems': 10,
-                    'PageSize': 10,
-                    'StartingToken': marker
-                }
-            )
-            for page in pages:
-                for function in page['Functions']:
-                    yield function['FunctionArn']
-            if 'NextMarker' not in page:
-                break
-            marker = page['NextMarker']
+        for page in paginate(client, 'list_functions'):
+            for function in page['Functions']:
+                yield function['FunctionArn']
+
+
+
 
 
 def run(arguments=''):
     args = parse_args(arguments)
+
+    lwrite = LambdaWrite(args)
 
     if args.html:
         HTMLReport(args.output).save()
@@ -72,8 +67,8 @@ def run(arguments=''):
     rmtree(args.output, ignore_errors=True)
     Path(args.output).mkdir(parents=True, exist_ok=True)
     configure_log(args.output)
-    identity = STS(f'arn:aws:sts:{args.region}', args.profile, args.keys[0], args.keys[1]).identity
     if args.verbose:
+        identity = STS(f'arn:aws:sts:{args.region}', args.profile, args.keys[0], args.keys[1]).identity
         print(header, end='\n\n')
         for _ in ['UserId', 'Account', 'Arn']:
             align(_, identity[_], orange)

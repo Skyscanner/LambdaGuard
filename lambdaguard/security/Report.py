@@ -26,8 +26,9 @@ class SecurityReport:
 
         OUT = []
 
-        with self.path.joinpath('index.json').open() as f:
-            index = json.loads(f.read())
+        index = json.loads(
+            self.path.joinpath('index.json').read_text()
+        )
 
         for sort in ['high', 'medium', 'low', 'info']:
             for idx, lmbd_arn in index.items():

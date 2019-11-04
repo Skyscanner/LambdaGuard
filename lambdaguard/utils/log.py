@@ -55,7 +55,7 @@ def debug(arn=''):
     etype, evalue = trace.split('\n')[-1].split(': ', 1)
 
     # Drop known messages
-    if 'botocore' in trace:
+    if 'botocore.e' in trace:
         # Differently formatted exception messages
         if not etype.startswith('botocore'):
             etype, evalue = trace.split('\n')[-2].split(': ', 1)
@@ -87,7 +87,7 @@ def debug(arn=''):
     elif trace.startswith('NoneType: None'):
         return None  # Empty
     elif etype == 'ValueError':
-        if 'Invalid endpoint:' in evalue:
+        if evalue.startswith('Invalid endpoint:'):
             return None  # Invalid resource configuration
 
     # Log

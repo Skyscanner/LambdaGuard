@@ -139,6 +139,8 @@ class Lambda(AWS):
             if self.role:
                 for policy in self.role.policy['policies']:
                     for statement in policy['document']['Statement']:
+                        if type(statement) != dict:
+                            continue
                         if statement['Effect'] != 'Allow':
                             continue
 

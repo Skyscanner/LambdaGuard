@@ -53,6 +53,10 @@ setup(
     url='https://github.com/Skyscanner/LambdaGuard',
     packages=find_packages(),
     include_package_data=True,
+    classifiers=[
+        'Programming Language :: Python :: 3.7'
+    ],
+    python_requires='>=3.7',
     setup_requires=['pytest-runner'],
     install_requires=install_requires,
     tests_require=dev_requires,
@@ -60,6 +64,6 @@ setup(
         'dev': dev_requires,
     },
     entry_points={
-        "console_scripts": ["lambdaguard=lambdaguard:run"],
+        'console_scripts': ['lambdaguard=lambdaguard:run'],
     }
 )

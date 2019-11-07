@@ -15,9 +15,6 @@ specific language governing permissions and limitations under the License.
 
 
 import boto3
-import json
-from pathlib import Path
-from lambdaguard.utils.arnparse import arnparse
 from lambdaguard.utils.iterator import iterate
 from lambdaguard.utils.paginator import paginate
 
@@ -72,10 +69,12 @@ class LambdaWrite:
                     }
                 })
 
-        self.save()
-        import json
-        print(json.dumps(self.writes, indent=4))
-        exit(0)
+    def get_for_lambda(self, arn):
+        for w_arn, w_policy in self.writes.items():
+            if w_arn == '*':
+                yield w_policy
+            elif w_arn == arn:
+                yield w_policy
 
     def get_attached_local_policies(self):
         client = boto3.Session(
@@ -119,8 +118,3 @@ class LambdaWrite:
                     'lambda': resource,
                     'actions': write_actions
                 }
-
-    def save(self):
-        Path(self.args.output, 'writes.json').write_text(
-            json.dumps(self.writes, indent=4)
-        )

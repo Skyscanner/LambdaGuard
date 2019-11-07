@@ -25,7 +25,7 @@ from lambdaguard.core.STS import STS
 from lambdaguard.visibility.Statistics import Statistics
 from lambdaguard.visibility.Report import VisibilityReport
 from lambdaguard.visibility.HTMLReport import HTMLReport
-from lambdaguard.visibility.LambdaWrite import LambdaWrite
+from lambdaguard.security.LambdaWrite import LambdaWrite
 from lambdaguard.security.Report import SecurityReport
 
 
@@ -50,13 +50,8 @@ def get_functions(args):
                 yield function['FunctionArn']
 
 
-
-
-
 def run(arguments=''):
     args = parse_args(arguments)
-
-    lwrite = LambdaWrite(args)
 
     if args.html:
         HTMLReport(args.output).save()
@@ -76,6 +71,7 @@ def run(arguments=''):
 
     statistics = Statistics(args.output)
     visibility = VisibilityReport(args.output)
+    writes = LambdaWrite(args)
 
     for arn_str in get_functions(args):
         try:
@@ -84,6 +80,8 @@ def run(arguments=''):
                 count = '[' + f'{statistics.statistics["lambdas"]+1}'.rjust(4, ' ') + '] '
                 print(f'\r{green}{count}{arn.resource}{nocolor}'.ljust(100, ' '), end='')
             lmbd = Lambda(arn.full, args)
+            for w in writes.get_for_lambda(arn.full):
+                lmbd.set_writes(w)
             statistics.parse(lmbd.report())
             visibility.save(lmbd.report())
         except Exception:

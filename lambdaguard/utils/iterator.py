@@ -24,7 +24,7 @@ def iterate(str_or_list):
     elif type(str_or_list) == list:
         for _ in str_or_list:
             yield _
-    elif str_or_list == None:
+    elif str_or_list is None:
         yield StopIteration
     else:
         raise TypeError(f'"{str_or_list}" is not a string or list')

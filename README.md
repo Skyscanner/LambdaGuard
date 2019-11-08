@@ -1,7 +1,9 @@
 # <img src="lambdaguard/assets/logo.png" width="40px" style="vertical-align:middle" alt="LambdaGuard" style=""> LambdaGuard
 
 [![](https://img.shields.io/pypi/v/lambdaguard.svg)](https://pypi.python.org/pypi/lambdaguard/)
-
+[![](https://img.shields.io/travis/Skyscanner/LambdaGuard)](https://travis-ci.org/Skyscanner/LambdaGuard)
+[![](https://img.shields.io/github/issues/Skyscanner/LambdaGuard)](https://github.com/Skyscanner/LambdaGuard/issues)
+[![](https://img.shields.io/github/issues-pr/Skyscanner/LambdaGuard)](https://github.com/Skyscanner/LambdaGuard/pulls)
 
 AWS Lambda is an event-driven, serverless computing platform provided by Amazon Web Services. It is a computing service that runs code in response to events and automatically manages the computing resources required by that code. 
 

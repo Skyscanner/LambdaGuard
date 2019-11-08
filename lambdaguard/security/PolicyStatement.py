@@ -24,8 +24,10 @@ class PolicyStatement:
         self.recommendations = []
 
     def audit(self):
+        if type(self.statement) != dict:
+            return None
         if self.statement['Effect'] != 'Allow':
-            return
+            return None
 
         # Where
         where = 'in Policy Statement'

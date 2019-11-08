@@ -33,6 +33,7 @@ class Lambda(AWS):
         self.role = None
         self.kms = None
         self.codeURL = None
+        self.writes = {'count': 0, 'items': {}}
         self.triggers = {'services': [], 'items': {}}
         self.resources = {'services': [], 'items': {}}
         self.security = {'count': {}, 'items': {}}
@@ -182,6 +183,14 @@ class Lambda(AWS):
         except Exception:
             debug(self.arn.full)
 
+    def set_writes(self, writes):
+        try:
+            self.writes['count'] += 1
+            for arn, policy in writes.items():
+                self.writes['items'][arn] = policy
+        except Exception:
+            debug(self.arn.full)
+
     def report(self):
         ret = {
             'arn': self.arn.full,
@@ -197,6 +206,7 @@ class Lambda(AWS):
                 'function': self.policy,
                 'role': self.role.policy
             },
+            'writes': self.writes,
             'triggers': self.triggers,
             'resources': self.resources,
             'security': self.security

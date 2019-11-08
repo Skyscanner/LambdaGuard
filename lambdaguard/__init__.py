@@ -19,11 +19,13 @@ from lambdaguard.utils.arnparse import arnparse
 from lambdaguard.utils.log import debug
 from lambdaguard.utils.cli import parse_args, align, header, nocolor, green, orange
 from lambdaguard.utils.log import configure_log
+from lambdaguard.utils.paginator import paginate
 from lambdaguard.core.Lambda import Lambda
 from lambdaguard.core.STS import STS
 from lambdaguard.visibility.Statistics import Statistics
 from lambdaguard.visibility.Report import VisibilityReport
 from lambdaguard.visibility.HTMLReport import HTMLReport
+from lambdaguard.security.LambdaWrite import LambdaWrite
 from lambdaguard.security.Report import SecurityReport
 
 
@@ -43,21 +45,9 @@ def get_functions(args):
             aws_secret_access_key=args.keys[1],
             region_name=args.region
         ).client('lambda')
-        marker = None
-        while True:
-            pages = client.get_paginator('list_functions').paginate(
-                PaginationConfig={
-                    'MaxItems': 10,
-                    'PageSize': 10,
-                    'StartingToken': marker
-                }
-            )
-            for page in pages:
-                for function in page['Functions']:
-                    yield function['FunctionArn']
-            if 'NextMarker' not in page:
-                break
-            marker = page['NextMarker']
+        for page in paginate(client, 'list_functions'):
+            for function in page['Functions']:
+                yield function['FunctionArn']
 
 
 def run(arguments=''):
@@ -72,8 +62,8 @@ def run(arguments=''):
     rmtree(args.output, ignore_errors=True)
     Path(args.output).mkdir(parents=True, exist_ok=True)
     configure_log(args.output)
-    identity = STS(f'arn:aws:sts:{args.region}', args.profile, args.keys[0], args.keys[1]).identity
     if args.verbose:
+        identity = STS(f'arn:aws:sts:{args.region}', args.profile, args.keys[0], args.keys[1]).identity
         print(header, end='\n\n')
         for _ in ['UserId', 'Account', 'Arn']:
             align(_, identity[_], orange)
@@ -81,6 +71,7 @@ def run(arguments=''):
 
     statistics = Statistics(args.output)
     visibility = VisibilityReport(args.output)
+    writes = LambdaWrite(args)
 
     for arn_str in get_functions(args):
         try:
@@ -89,6 +80,8 @@ def run(arguments=''):
                 count = '[' + f'{statistics.statistics["lambdas"]+1}'.rjust(4, ' ') + '] '
                 print(f'\r{green}{count}{arn.resource}{nocolor}'.ljust(100, ' '), end='')
             lmbd = Lambda(arn.full, args)
+            for w in writes.get_for_lambda(arn.full):
+                lmbd.set_writes(w)
             statistics.parse(lmbd.report())
             visibility.save(lmbd.report())
         except Exception:

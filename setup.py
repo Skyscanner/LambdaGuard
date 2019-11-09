@@ -13,7 +13,14 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 from setuptools import setup, find_packages
-from lambdaguard.__version__ import __version__
+from pathlib import Path
+
+
+def get_version():
+    ret = {}
+    code = Path(__file__).parent.joinpath('lambdaguard', '__version__.py')
+    exec(code.read_text(), ret)
+    return ret['__version__']
 
 
 long_description = '''
@@ -43,7 +50,7 @@ dev_requires = [
 
 setup(
     name='LambdaGuard',
-    version=__version__,
+    version=get_version(),
     author='Artëm Tsvetkov',
     author_email='artem.tsvetkov@skyscanner.net',
     description='LambdaGuard',

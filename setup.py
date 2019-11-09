@@ -53,9 +53,9 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     classifiers=[
-        'Programming Language :: Python :: 3.7'
+        'Programming Language :: Python :: 3.6.3'
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.6.3',
     setup_requires=['pytest-runner'],
     install_requires=install_requires,
     tests_require=dev_requires,

@@ -13,10 +13,9 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 from setuptools import setup, find_packages
-from pathlib import Path
+from lambdaguard.__version__ import __version__
 
 
-version = Path('lambdaguard/version.txt').read_text()
 long_description = '''
 LambdaGuard is an AWS Serverless Security auditing tool designed to create asset visibility 
 and provide actionable results. It provides a meaningful overview in terms of 
@@ -44,7 +43,7 @@ dev_requires = [
 
 setup(
     name='LambdaGuard',
-    version=version,
+    version=__version__,
     author='Artëm Tsvetkov',
     author_email='artem.tsvetkov@skyscanner.net',
     description='LambdaGuard',

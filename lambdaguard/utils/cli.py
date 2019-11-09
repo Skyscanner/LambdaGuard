@@ -13,13 +13,12 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 import argparse
-from pathlib import Path
 from os import environ
+from lambdaguard.__version__ import __version__
 
 
 environ['PYTHONIOENCODING'] = 'UTF-8'
 
-__version__ = Path(__file__).parents[1].joinpath('version.txt').read_text()
 
 orange = '\033[3;33m'
 green = '\033[0;32m'

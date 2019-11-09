@@ -1,2 +1,1 @@
 recursive-include lambdaguard *.html *.css *.png *.js
-include lambdaguard/version.txt

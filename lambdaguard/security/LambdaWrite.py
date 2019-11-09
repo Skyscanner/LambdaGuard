@@ -98,6 +98,10 @@ class LambdaWrite:
                 yield policy['Arn'], version
 
     def parse(self, policy):
+        if 'Document' not in policy:
+            return None
+        if 'Statement' not in policy['Document']:
+            return None
         for statement in policy['Document']['Statement']:
             # Skip if not Allow
             if statement['Effect'] != 'Allow':

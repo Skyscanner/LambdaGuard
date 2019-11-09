@@ -10,7 +10,7 @@ AWS Lambda is an event-driven, serverless computing platform provided by Amazon 
 LambdaGuard is an AWS Lambda auditing tool designed to create asset visibility and provide actionable results. It provides a meaningful overview in terms of statistical analysis, AWS service dependencies and configuration checks from the security perspective.
 
 ## Requirements
-- Python 3.7
+- Python 3.6.3
 - Java 8+ (optional for SonarQube)
 
 ## Install

@@ -23,7 +23,7 @@ from lambdaguard.security.Encryption import Encryption
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.fixtures = Path(__file__).parents[1].joinpath('fixtures')
+        cls.fixtures = Path(__file__).parents[2].joinpath('fixtures')
 
     def test_encryption_ok(self):
         expected = StopIteration

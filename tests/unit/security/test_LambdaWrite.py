@@ -37,7 +37,7 @@ class LambdaWriteHook(LambdaWrite):
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.fixtures = Path(__file__).parents[1].joinpath('fixtures')
+        cls.fixtures = Path(__file__).parents[2].joinpath('fixtures')
 
         # Load policy version template
         cls.policy = json.loads(

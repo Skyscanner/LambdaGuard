@@ -21,7 +21,7 @@ from lambdaguard.utils.cli import *
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.fixtures = Path(__file__).parents[1].joinpath('fixtures')
+        cls.fixtures = Path(__file__).parents[2].joinpath('fixtures')
 
     def test_parse_args(self):
         # Reset sys.argv

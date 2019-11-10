@@ -21,7 +21,7 @@ from lambdaguard.utils.arnparse import arnparse
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.fixtures = Path(__file__).parents[1].joinpath('fixtures')
+        cls.fixtures = Path(__file__).parents[2].joinpath('fixtures')
 
     def test_arnparse_to_dict(self):
         arn_str = 'arn:aws:lambda:eu-west-1:0:function:function-name'

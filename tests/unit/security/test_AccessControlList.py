@@ -21,7 +21,7 @@ from lambdaguard.security.AccessControlList import AccessControlList
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.fixtures = Path(__file__).parents[1].joinpath('fixtures')
+        cls.fixtures = Path(__file__).parents[2].joinpath('fixtures')
 
     def test_ok(self):
         acl = json.loads(self.fixtures.joinpath('AccessControlListOk.json').read_text())

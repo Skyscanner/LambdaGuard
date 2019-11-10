@@ -21,7 +21,7 @@ from lambdaguard.utils.log import *
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.fixtures = Path(__file__).parents[1].joinpath('fixtures')
+        cls.fixtures = Path(__file__).parents[2].joinpath('fixtures')
         cls.logpath = '/tmp/lambdaguard.log'
 
     def test_configure_log(self):

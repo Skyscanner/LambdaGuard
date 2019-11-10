@@ -21,7 +21,7 @@ from lambdaguard.security.PolicyStatement import PolicyStatement
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.fixtures = Path(__file__).parents[1].joinpath('fixtures')
+        cls.fixtures = Path(__file__).parents[2].joinpath('fixtures')
 
     def test_is_unrestricted(self):
         policy = json.loads(self.fixtures.joinpath('PolicyUnrestricted.json').read_text())

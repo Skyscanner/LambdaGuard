@@ -1,0 +1,24 @@
+{
+    "Document": {
+        "Version": "2012-10-17",
+        "Statement": [{
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "lambda:TagResource",
+                "lambda:UpdateFunctionConfiguration",
+                "lambda:DeleteFunction",
+                "lambda:PublishVersion"
+            ],
+            "Resource": "arn:aws:lambda:eu-west-1:0:function:functionName"
+        }, {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": "lambda:CreateEventSourceMapping",
+            "Resource": "*"
+        }]
+    },
+    "VersionId": "v1",
+    "IsDefaultVersion": true,
+    "CreateDate": ""
+}

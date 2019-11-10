@@ -19,37 +19,40 @@ from lambdaguard.utils.iterator import iterate
 from lambdaguard.utils.paginator import paginate
 
 
+LAMBDA_WRITE_PERMISSIONS = [x.lower() for x in [
+    '*',
+    'lambda:*',
+    'lambda:Create*',
+    'lambda:Delete*',
+    'lambda:Invoke*',
+    'lambda:Publish*',
+    'lambda:Put*',
+    'lambda:Tag*',
+    'lambda:Untag*',
+    'lambda:Update*',
+    'lambda:CreateAlias',
+    'lambda:CreateFunction',
+    'lambda:DeleteAlias',
+    'lambda:DeleteEventSourceMapping',
+    'lambda:DeleteFunction',
+    'lambda:DeleteFunctionConcurrency',
+    'lambda:DeleteLayerVersion',
+    'lambda:InvokeAsync',
+    'lambda:InvokeFunction',
+    'lambda:PublishLayerVersion',
+    'lambda:PublishVersion',
+    'lambda:PutFunctionConcurrency',
+    'lambda:TagResource',
+    'lambda:UntagResource',
+    'lambda:UpdateAlias',
+    'lambda:UpdateEventSourceMapping',
+    'lambda:UpdateFunctionCode',
+    'lambda:UpdateFunctionConfiguration'
+]]
+
+
 def is_write_action(action):
-    return action in [
-        '*',
-        'lambda:*',
-        'lambda:Create*',
-        'lambda:Delete*',
-        'lambda:Invoke*',
-        'lambda:Publish*',
-        'lambda:Put*',
-        'lambda:Tag*',
-        'lambda:Untag*',
-        'lambda:Update*',
-        'lambda:CreateAlias',
-        'lambda:CreateFunction',
-        'lambda:DeleteAlias',
-        'lambda:DeleteEventSourceMapping',
-        'lambda:DeleteFunction',
-        'lambda:DeleteFunctionConcurrency',
-        'lambda:DeleteLayerVersion',
-        'lambda:InvokeAsync',
-        'lambda:InvokeFunction',
-        'lambda:PublishLayerVersion',
-        'lambda:PublishVersion',
-        'lambda:PutFunctionConcurrency',
-        'lambda:TagResource',
-        'lambda:UntagResource',
-        'lambda:UpdateAlias',
-        'lambda:UpdateEventSourceMapping',
-        'lambda:UpdateFunctionCode',
-        'lambda:UpdateFunctionConfiguration'
-    ]
+    return action.lower() in LAMBDA_WRITE_PERMISSIONS
 
 
 class LambdaWrite:
@@ -60,42 +63,16 @@ class LambdaWrite:
     def __init__(self, args):
         self.args = args
         self.writes = {}
+        self.get_writes()
 
+    def get_writes(self):
         for policy_arn, policy in self.get_attached_local_policies():
-            for _ in self.parse(policy):
-                self.writes.update({
-                    _['lambda']: {
-                        policy_arn: _['actions']
-                    }
-                })
-
-    def get_for_lambda(self, arn):
-        for w_arn, w_policy in self.writes.items():
-            if w_arn == '*':
-                yield w_policy
-            elif w_arn == arn:
-                yield w_policy
-
-    def get_attached_local_policies(self):
-        client = boto3.Session(
-            profile_name=self.args.profile,
-            aws_access_key_id=self.args.keys[0],
-            aws_secret_access_key=self.args.keys[1],
-            region_name=self.args.region
-        ).client('iam')
-        pages = paginate(
-            client,
-            'list_policies',
-            Scope='Local',
-            OnlyAttached=True
-        )
-        for page in pages:
-            for policy in page['Policies']:
-                version = client.get_policy_version(
-                    PolicyArn=policy['Arn'],
-                    VersionId=policy['DefaultVersionId']
-                )['PolicyVersion']
-                yield policy['Arn'], version
+            for lambda_arn, actions in self.parse(policy):
+                if lambda_arn not in self.writes:
+                    self.writes[lambda_arn] = {}
+                if policy_arn not in self.writes[lambda_arn]:
+                    self.writes[lambda_arn][policy_arn] = {}
+                self.writes[lambda_arn][policy_arn] = actions
 
     def parse(self, policy):
         if 'Document' not in policy:
@@ -117,8 +94,33 @@ class LambdaWrite:
                 return None
 
             # Return all write Actions per Resource
-            for resource in iterate(statement['Resource']):
-                yield {
-                    'lambda': resource,
-                    'actions': write_actions
-                }
+            for arn in iterate(statement['Resource']):
+                yield arn, write_actions
+
+    def get_for_lambda(self, arn):
+        for w_arn, w_actions in self.writes.items():
+            if w_arn == '*':
+                yield w_actions
+            elif w_arn == arn:
+                yield w_actions
+
+    def get_attached_local_policies(self):
+        client = boto3.Session(
+            profile_name=self.args.profile,
+            aws_access_key_id=self.args.keys[0],
+            aws_secret_access_key=self.args.keys[1],
+            region_name=self.args.region
+        ).client('iam')
+        pages = paginate(
+            client,
+            'list_policies',
+            Scope='Local',
+            OnlyAttached=True
+        )
+        for page in pages:
+            for policy in page['Policies']:
+                version = client.get_policy_version(
+                    PolicyArn=policy['Arn'],
+                    VersionId=policy['DefaultVersionId']
+                )['PolicyVersion']
+                yield policy['Arn'], version

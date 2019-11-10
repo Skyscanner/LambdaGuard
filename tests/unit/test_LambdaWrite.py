@@ -15,7 +15,8 @@ specific language governing permissions and limitations under the License.
 import unittest
 import json
 from pathlib import Path
-from lambdaguard.security.LambdaWrite import LambdaWrite
+from copy import deepcopy
+from lambdaguard.security.LambdaWrite import LambdaWrite, is_write_action
 
 
 class LambdaWriteHook(LambdaWrite):
@@ -29,7 +30,7 @@ class LambdaWriteHook(LambdaWrite):
     def get_attached_local_policies(self):
         if not self.policies:
             return 'arn', {'policy': {}}
-        for arn, version in self.policies:
+        for arn, version in self.policies.items():
             yield arn, version
 
 
@@ -38,7 +39,46 @@ class Test(unittest.TestCase):
     def setUpClass(cls):
         cls.fixtures = Path(__file__).parents[1].joinpath('fixtures')
 
-    def test_get_for_lambda(self):
+        # Load policy version template
+        policy = json.loads(
+            cls.fixtures.joinpath('PolicyVersion.json').read_text()
+        )
+        # All lambda actions
+        policy_all_lambda = deepcopy(policy)
+        policy_all_lambda['Document']['Statement'][0]['Action'] = 'lambda:*'
+        # All actions
+        policy_all = deepcopy(policy)
+        policy_all['Document']['Statement'][0]['Action'] = ['*']
+
+        # Mock IAM policies for testing
+        cls.policies = {
+            'arn:aws:iam:policy1': policy,
+            'arn:aws:iam:policy2': policy_all_lambda,
+            'arn:aws:iam:policy3': policy_all
+        }
+
+    def test_is_write_action(self):
+        # True
+        self.assertTrue(is_write_action('*'))
+        self.assertTrue(is_write_action('LAMBDA:*'))
+        self.assertTrue(is_write_action('lambda:Create*'))
+        self.assertTrue(is_write_action('Lambda:TagResource'))
+        # False
+        self.assertFalse(is_write_action('iam:*'))
+        self.assertFalse(is_write_action('lambda:GetLayerVersionByArn'))
+        self.assertFalse(is_write_action('LAMBDA:ListFunctions'))
+        self.assertFalse(is_write_action('lambda:get*'))
+
+    def test_get_writes(self):
+        # No WRITE
         hook = LambdaWriteHook()
         self.assertEqual(hook.writes, {})
+        # Custom WRITE
+        hook = LambdaWriteHook(policies=self.policies)
+        for lambda_arn, policies in hook.writes.items():
+            self.assertEqual(len(policies), len(self.policies))
+            for policy in policies:
+                self.assertIn(policy, self.policies)
 
+    def test_get_for_lambda(self):
+        hook = LambdaWriteHook(policies=self.policies)

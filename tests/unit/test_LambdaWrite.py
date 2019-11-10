@@ -29,7 +29,7 @@ class LambdaWriteHook(LambdaWrite):
 
     def get_attached_local_policies(self):
         if not self.policies:
-            return 'arn', {'policy': {}}
+            return StopIteration
         for arn, version in self.policies.items():
             yield arn, version
 
@@ -40,21 +40,30 @@ class Test(unittest.TestCase):
         cls.fixtures = Path(__file__).parents[1].joinpath('fixtures')
 
         # Load policy version template
-        policy = json.loads(
+        cls.policy = json.loads(
             cls.fixtures.joinpath('PolicyVersion.json').read_text()
         )
         # All lambda actions
-        policy_all_lambda = deepcopy(policy)
-        policy_all_lambda['Document']['Statement'][0]['Action'] = 'lambda:*'
+        cls.policy_all_lambda = deepcopy(cls.policy)
+        cls.policy_all_lambda['Document']['Statement'][0]['Action'] = 'lambda:*'
         # All actions
-        policy_all = deepcopy(policy)
-        policy_all['Document']['Statement'][0]['Action'] = ['*']
+        cls.policy_all = deepcopy(cls.policy)
+        cls.policy_all['Document']['Statement'][0]['Action'] = ['*']
+        # All actions on all resources
+        cls.policy_all_res = deepcopy(cls.policy)
+        cls.policy_all_res['Document']['Statement'][0]['Action'] = ['*']
+        cls.policy_all_res['Document']['Statement'][0]['Resource'] = ['*']
+        # Deny effect
+        cls.policy_deny = deepcopy(cls.policy)
+        cls.policy_deny['Document']['Statement'][0]['Effect'] = 'Deny'
 
         # Mock IAM policies for testing
         cls.policies = {
-            'arn:aws:iam:policy1': policy,
-            'arn:aws:iam:policy2': policy_all_lambda,
-            'arn:aws:iam:policy3': policy_all
+            'arn:aws:iam:policy1': cls.policy,
+            'arn:aws:iam:policy2': cls.policy_deny,
+            'arn:aws:iam:policy3': cls.policy_all_lambda,
+            'arn:aws:iam:policy4': cls.policy_all,
+            'arn:aws:iam:policy5': cls.policy_all_res
         }
 
     def test_is_write_action(self):
@@ -70,15 +79,64 @@ class Test(unittest.TestCase):
         self.assertFalse(is_write_action('lambda:get*'))
 
     def test_get_writes(self):
-        # No WRITE
+        # No WRITE permissions
         hook = LambdaWriteHook()
         self.assertEqual(hook.writes, {})
-        # Custom WRITE
+        # Custom WRITE permissions
         hook = LambdaWriteHook(policies=self.policies)
         for lambda_arn, policies in hook.writes.items():
-            self.assertEqual(len(policies), len(self.policies))
+            self.assertGreaterEqual(len(policies), 1)
             for policy in policies:
                 self.assertIn(policy, self.policies)
 
+    def test_get_attached_local_policies(self):
+        hook = LambdaWriteHook()
+        with self.assertRaises(StopIteration):
+            next(hook.get_attached_local_policies())
+
+    def test_parse(self):
+        hook = LambdaWriteHook()
+        # Empty policy
+        with self.assertRaises(StopIteration):
+            next(hook.parse({}))
+        # Invalid policy
+        with self.assertRaises(StopIteration):
+            next(hook.parse({'policy': []}))
+        with self.assertRaises(StopIteration):
+            next(hook.parse({'Document': {'policy': []}}))
+        # Policy not Allow-ed
+        with self.assertRaises(StopIteration):
+            next(hook.parse(self.policy_deny))
+        # Identify all WRITE permissions
+        arn, actions = next(hook.parse(self.policy))
+        self.assertEqual(arn, 'arn:aws:lambda:eu-west-1:0:function:functionName')
+        expected_actions = [
+            "lambda:TagResource",
+            "lambda:UpdateFunctionConfiguration",
+            "lambda:DeleteFunction",
+            "lambda:PublishVersion"
+        ]
+        for e in expected_actions:
+            self.assertIn(e, actions)
+        # Identify wildcard permissions
+        arn, actions = next(hook.parse(self.policy_all))
+        self.assertEqual(actions, ['*'])
+        arn, actions = next(hook.parse(self.policy_all_lambda))
+        self.assertEqual(actions, ['lambda:*'])
+
     def test_get_for_lambda(self):
+        # Denied policy
+        hook = LambdaWriteHook(policies={
+            'arn:aws:iam:policy_deny_write': self.policy_deny
+        })
+        writes = hook.get_for_lambda('arn:aws:lambda:eu-west-1:0:function:functionName')
+        with self.assertRaises(StopIteration):
+            next(writes)
+        # All policies
         hook = LambdaWriteHook(policies=self.policies)
+        writes = hook.get_for_lambda('arn:aws:lambda:eu-west-1:0:function:functionName')
+        for _ in range(2):  # There should be 2 that apply
+            actions = next(writes)
+            print(actions)
+        with self.assertRaises(StopIteration):
+            next(writes)

@@ -74,36 +74,6 @@ class LambdaWrite:
                     self.writes[lambda_arn][policy_arn] = {}
                 self.writes[lambda_arn][policy_arn] = actions
 
-    def parse(self, policy):
-        if 'Document' not in policy:
-            return None
-        if 'Statement' not in policy['Document']:
-            return None
-        for statement in policy['Document']['Statement']:
-            # Skip if not Allow
-            if statement['Effect'] != 'Allow':
-                continue
-
-            # Identify all write Actions
-            write_actions = []
-            for action in iterate(statement['Action']):
-                if not is_write_action(action):
-                    continue
-                write_actions.append(action)
-            if not write_actions:
-                return None
-
-            # Return all write Actions per Resource
-            for arn in iterate(statement['Resource']):
-                yield arn, write_actions
-
-    def get_for_lambda(self, arn):
-        for w_arn, w_actions in self.writes.items():
-            if w_arn == '*':
-                yield w_actions
-            elif w_arn == arn:
-                yield w_actions
-
     def get_attached_local_policies(self):
         client = boto3.Session(
             profile_name=self.args.profile,
@@ -124,3 +94,33 @@ class LambdaWrite:
                     VersionId=policy['DefaultVersionId']
                 )['PolicyVersion']
                 yield policy['Arn'], version
+
+    def parse(self, policy):
+        if 'Document' not in policy:
+            return StopIteration
+        if 'Statement' not in policy['Document']:
+            return StopIteration
+        for statement in policy['Document']['Statement']:
+            # Skip if not Allow
+            if statement['Effect'] != 'Allow':
+                continue
+
+            # Identify all write Actions
+            write_actions = []
+            for action in iterate(statement['Action']):
+                if not is_write_action(action):
+                    continue
+                write_actions.append(action)
+            if not write_actions:
+                return StopIteration
+
+            # Return all write Actions per Resource
+            for arn in iterate(statement['Resource']):
+                yield arn, write_actions
+
+    def get_for_lambda(self, arn):
+        for w_arn, w_actions in self.writes.items():
+            if w_arn == '*':
+                yield w_actions
+            elif w_arn == arn:
+                yield w_actions

@@ -124,10 +124,12 @@ def parse_args(arguments=''):
 
 
 def align(key, value, color=green):
-    print(
+    ret = (
         ' ' * 10 +
         color +
         f'{key}'.ljust(15, '.') +
         f' {value}'.rjust(0, '.') +
         nocolor
     )
+    print(ret)
+    return ret

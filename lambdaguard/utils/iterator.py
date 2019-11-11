@@ -20,11 +20,11 @@ def iterate(str_or_list):
     Returns values one by one as if it were a list
     """
     if type(str_or_list) == str:
+        if not len(str_or_list.strip()):
+            return StopIteration
         yield str_or_list
     elif type(str_or_list) == list:
         for _ in str_or_list:
             yield _
-    elif str_or_list is None:
-        yield StopIteration
     else:
         raise TypeError(f'"{str_or_list}" is not a string or list')

@@ -59,9 +59,9 @@ setup(
     url='https://github.com/Skyscanner/LambdaGuard',
     packages=find_packages(),
     include_package_data=True,
-    classifiers=[
-        'Programming Language :: Python :: 3.6.3'
-    ],
+    # classifiers=[
+    #     'Programming Language :: Python :: 3.6.3'
+    # ],
     python_requires='>=3.6.3',
     setup_requires=['pytest-runner'],
     install_requires=install_requires,

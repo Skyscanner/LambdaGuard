@@ -22,7 +22,7 @@ def configure_log(path=''):
     logpath = Path(path, 'lambdaguard.log').as_posix()
     logging.config.dictConfig({
         'version': 1,
-        'disable_existing_loggers': True,
+        'disable_existing_loggers': False,
         'formatters': {
             'default': {
                 'class': 'logging.Formatter',

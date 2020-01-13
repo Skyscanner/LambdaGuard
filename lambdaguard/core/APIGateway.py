@@ -28,11 +28,18 @@ class APIGateway(AWS):
 
         self.get_api()
 
-        self.info = f'API Endpoints:\n' + '\n- '.join(self.resources)
+        self.info = f'REST API ID: {self.rest_api_id}'
 
     def get_api(self):
         self.rest_api_id = self.arn.full.split(':')[-1].split('/')[0]
         self.endpoint = f'https://{self.rest_api_id}.execute-api.{self.arn.region}.amazonaws.com'
+
+        try:
+            rest_api = self.client.get_rest_api(restApiId=self.rest_api_id)
+            if 'policy' in rest_api:
+                self.policy = json.loads(rest_api['policy'].replace('\\', ''))
+        except Exception:
+            debug(self.arn.full)
 
         try:
             for item in self.client.get_stages(restApiId=self.rest_api_id)['item']:
@@ -42,16 +49,19 @@ class APIGateway(AWS):
 
         try:
             for item in self.client.get_resources(restApiId=self.rest_api_id)['items']:
-                path = item['path']
                 if 'resourceMethods' in item:
-                    for method in item['resourceMethods']:
-                        self.resources.append(f'{method} {path}')
-        except Exception:
-            debug(self.arn.full)
-
-        try:
-            rest_api = self.client.get_rest_api(restApiId=self.rest_api_id)
-            if 'policy' in rest_api:
-                self.policy = json.loads(rest_api['policy'].replace('\\', ''))
+                    for http_method in item['resourceMethods']:
+                        method = self.client.get_method(
+                            restApiId=self.rest_api_id,
+                            resourceId=item['id'],
+                            httpMethod=http_method
+                        )
+                        self.resources.append({
+                            'id': item['id'],
+                            'method': http_method,
+                            'path': item['path'],
+                            'apiKeyRequired': method['apiKeyRequired'],
+                            'authorizationType': method['authorizationType']
+                        })
         except Exception:
             debug(self.arn.full)

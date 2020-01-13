@@ -23,10 +23,16 @@ class Public:
             if self.item.policy:
                 return
 
-            # Check if API KEY is required for all resources
+            apiKeyRequired = False
+            authorizationType = None
             for res in self.item.resources:
-                if not res['apiKeyRequired']:
-                    yield {
-                        'level': 'high',
-                        'text': 'Service is publicly accessible due to missing Resource-based policy'
-                    }
+                if res['apiKeyRequired']:
+                    apiKeyRequired = True
+                if res['authorizationType'] != 'NONE':
+                    authorizationType = res['authorizationType']
+
+            if not apiKeyRequired and not authorizationType:
+                yield {
+                    'level': 'high',
+                    'text': 'Service is publicly accessible due to missing Resource-based policy'
+                }

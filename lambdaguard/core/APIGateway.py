@@ -27,6 +27,8 @@ class APIGateway(AWS):
         self.resources = []
 
         self.get_api()
+        from pprint import pprint
+        pprint(self.resources)
 
         self.info = f'REST API ID: {self.rest_api_id}'
 

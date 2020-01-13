@@ -48,3 +48,9 @@ class Test(unittest.TestCase):
         obj.resources = [{'id': '0', 'method': 'GET', 'path': '/', 'apiKeyRequired': True, 'authorizationType': 'NONE'}]
         with self.assertRaises(expected):
             next(Public(obj).audit())
+
+        # No policy and Authorization Type set
+        expected = StopIteration
+        obj.resources = [{'id': '0', 'method': 'GET', 'path': '/', 'apiKeyRequired': False, 'authorizationType': 'AWS_IAM'}]
+        with self.assertRaises(expected):
+            next(Public(obj).audit())

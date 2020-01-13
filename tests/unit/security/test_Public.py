@@ -32,9 +32,25 @@ class Test(unittest.TestCase):
             next(Public(obj).audit())
 
     def test_public(self):
-        arn = 'arn:aws:execute-api:eu-west-1:0:id/stage/method/path'
+        obj = APIGateway('arn:aws:execute-api:eu-west-1:0:id/stage/method/path')
+
+        # No policy and API Key not required
         expected = {
             'level': 'high',
             'text': 'Service is publicly accessible due to missing Resource-based policy'
         }
-        self.assertEqual(expected, next(Public(APIGateway(arn)).audit()))
+        obj.policy = {}
+        obj.resources = [{'id': '0', 'method': 'GET', 'path': '/', 'apiKeyRequired': False, 'authorizationType': 'NONE'}]
+        self.assertEqual(expected, next(Public(obj).audit()))
+
+        # No policy and API Key required
+        expected = StopIteration
+        obj.resources = [{'id': '0', 'method': 'GET', 'path': '/', 'apiKeyRequired': True, 'authorizationType': 'NONE'}]
+        with self.assertRaises(expected):
+            next(Public(obj).audit())
+
+        # No policy and Authorization Type set
+        expected = StopIteration
+        obj.resources = [{'id': '0', 'method': 'GET', 'path': '/', 'apiKeyRequired': False, 'authorizationType': 'AWS_IAM'}]
+        with self.assertRaises(expected):
+            next(Public(obj).audit())

@@ -56,7 +56,12 @@ class Test(unittest.TestCase):
         # Deny effect
         cls.policy_deny = deepcopy(cls.policy)
         cls.policy_deny['Document']['Statement'][0]['Effect'] = 'Deny'
-
+        # Unknown / unspecified effect
+        cls.policy_no_effect = deepcopy(cls.policy)
+        del cls.policy_no_effect['Document']['Statement'][0]['Effect']
+        # Unknown / unspecified actions
+        cls.policy_no_action = deepcopy(cls.policy)
+        del cls.policy_no_action['Document']['Statement'][0]['Action']
         # Mock IAM policies for testing
         cls.policies = {
             'arn:aws:iam:policy1': cls.policy,
@@ -107,6 +112,12 @@ class Test(unittest.TestCase):
         # Policy not Allow-ed
         with self.assertRaises(StopIteration):
             next(hook.parse(self.policy_deny))
+        # No Effect
+        with self.assertRaises(StopIteration):
+            next(hook.parse(self.policy_no_effect))
+        # No Action
+        with self.assertRaises(StopIteration):
+            next(hook.parse(self.policy_no_action))
         # Identify all WRITE permissions
         arn, actions = next(hook.parse(self.policy))
         self.assertEqual(arn, 'arn:aws:lambda:eu-west-1:0:function:functionName')

@@ -101,9 +101,12 @@ class LambdaWrite:
         if 'Statement' not in policy['Document']:
             return StopIteration
         for statement in policy['Document']['Statement']:
-            # Skip if not Allow
+            if 'Effect' not in statement:
+                continue  # Unknown
             if statement['Effect'] != 'Allow':
-                continue
+                continue  # Not allowed
+            if 'Action' not in statement:
+                continue  # No permissions
 
             # Identify all write Actions
             write_actions = []

@@ -100,7 +100,13 @@ class LambdaWrite:
             return StopIteration
         if 'Statement' not in policy['Document']:
             return StopIteration
-        for statement in policy['Document']['Statement']:
+
+        if not isinstance(policy['Document']['Statement'], list):
+            statements = [policy['Document']['Statement']]
+        else:
+            statements = policy['Document']['Statement']
+
+        for statement in statements:
             if 'Effect' not in statement:
                 continue  # Unknown
             if statement['Effect'] != 'Allow':

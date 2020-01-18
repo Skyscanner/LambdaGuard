@@ -38,7 +38,7 @@ class Lambda(AWS):
         self.resources = {'services': [], 'items': {}}
         self.security = {'count': {}, 'items': {}}
 
-        self.get_function()
+        self.get_function(self.args.auditor)
         self.get_policy()
         self.get_triggers()
         self.get_resources()
@@ -54,13 +54,19 @@ class Lambda(AWS):
         except Exception:
             debug(self.arn.full)
 
-    def get_function(self):
+    def get_function(self, auditor=False):
         '''
         Fetches Lambda function configuration
         '''
         try:
-            function = self.client.get_function(FunctionName=self.arn.resource)
-            config = function['Configuration']
+            if auditor:  # An auditor does not have access to the code, only to the configuration
+                config = self.client.get_function_configuration(FunctionName=self.arn.resource)
+                self.codeURL = ''
+            else:
+                function = self.client.get_function(FunctionName=self.arn.resource)
+                config = function['Configuration']
+                self.codeURL = function['Code']['Location']
+
             self.runtime = config['Runtime']
             self.handler = config['Handler']
             self.description = config['Description']
@@ -77,7 +83,6 @@ class Lambda(AWS):
                 access_key_id=self.access_key_id,
                 secret_access_key=self.secret_access_key
             )
-            self.codeURL = function['Code']['Location']
             self.layers = []
             if 'Layers' in config:
                 for layer in config['Layers']:

@@ -161,23 +161,29 @@ class HTMLReport:
                 funcvuln_html.append(ret)
 
             layers = []
-            for layer in func['layers']:
-                layers.append(f"{layer['arn']} ({layer['description']})")
-                layer.update({'runtime': func['runtime']})
-                if layer not in all_layers:
-                    all_layers.append(layer)
+            if func['layers']:
+                for layer in func['layers']:
+                    layers.append(f"{layer['arn']} ({layer['description']})")
+                    layer.update({'runtime': func['runtime']})
+                    if layer not in all_layers:
+                        all_layers.append(layer)
 
             html = func_html_template
             html = html.replace('{index}', idx)
             html = html.replace('{arn}', func['arn'])
             html = html.replace('{name}', func['name'])
-            html = html.replace('{description}', func['description'])
+            if func['description']:
+                html = html.replace('{description}', func['description'])
             html = html.replace('{region}', func['region'])
-            html = html.replace('{runtime}', func['runtime'])
-            html = html.replace('{handler}', func['handler'])
-            html = html.replace('{role}', func['role'])
+            if func['runtime']:
+                html = html.replace('{runtime}', func['runtime'])
+            if func['handler']:
+                html = html.replace('{handler}', func['handler'])
+            if func['role'] != "":
+                html = html.replace('{role}', func['role'])
             html = html.replace('{layers}', self.txt2html('\n'.join(layers)))
-            html = html.replace('{layers_count}', str(len(func['layers'])))
+            if func['layers']:
+                html = html.replace('{layers_count}', str(len(func['layers'])))
             html = html.replace('{triggers}', self.txt2html(', '.join(func['triggers']['services'])))
             html = html.replace('{triggers_count}', str(len(func['triggers']['services'])))
             html = html.replace('{resources}', self.txt2html(', '.join(func['resources']['services'])))

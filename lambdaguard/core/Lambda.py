@@ -38,7 +38,7 @@ class Lambda(AWS):
         self.resources = {'services': [], 'items': {}}
         self.security = {'count': {}, 'items': {}}
 
-        self.get_function(self.args.auditor)
+        self.get_function()
         self.get_policy()
         self.get_triggers()
         self.get_resources()
@@ -54,19 +54,13 @@ class Lambda(AWS):
         except Exception:
             debug(self.arn.full)
 
-    def get_function(self, auditor=False):
+    def get_function(self):
         '''
         Fetches Lambda function configuration
         '''
         try:
-            if auditor:  # An auditor does not have access to the code, only to the configuration
-                config = self.client.get_function_configuration(FunctionName=self.arn.resource)
-                self.codeURL = ''
-            else:
-                function = self.client.get_function(FunctionName=self.arn.resource)
-                config = function['Configuration']
-                self.codeURL = function['Code']['Location']
-
+            function = self.client.get_function(FunctionName=self.arn.resource)
+            config = function['Configuration']
             self.runtime = config['Runtime']
             self.handler = config['Handler']
             self.description = config['Description']
@@ -83,6 +77,7 @@ class Lambda(AWS):
                 access_key_id=self.access_key_id,
                 secret_access_key=self.secret_access_key
             )
+            self.codeURL = function['Code']['Location']
             self.layers = []
             if 'Layers' in config:
                 for layer in config['Layers']:
@@ -197,8 +192,9 @@ class Lambda(AWS):
             debug(self.arn.full)
 
     def report(self):
+
         ret = {
-            'arn': self.arn.full,
+            
             'name': self.arn.resource,
             'description': self.description,
             'region': self.arn.region,
@@ -206,16 +202,31 @@ class Lambda(AWS):
             'handler': self.handler,
             'layers': self.layers,
             'codeURL': self.codeURL,
-            'role': self.role.arn.full,
             'policy': {
-                'function': self.policy,
-                'role': self.role.policy
+                'function': "",
+                'role': ""
             },
             'writes': self.writes,
             'triggers': self.triggers,
             'resources': self.resources,
-            'security': self.security
+            'security': self.security,
+            'role':""
         }
+
+       
+
+        if self.policy:
+            ret['policy']['function'] = self.policy
+        if self.role:
+            if self.role.arn:
+                ret['role'] = self.role.arn.full
+            if self.role.policy:
+                ret['policy']['role'] = self.role.policy    
+        if self.arn:
+            ret['arn'] = self.arn.full
+            
+
+       
         if self.kms:
             ret['kms'] = self.kms.arn.full
             ret['policy']['kms'] = self.kms.policies

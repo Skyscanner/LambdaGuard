@@ -87,18 +87,24 @@ class Scan:
                         self.track(self.report['arn'], _)
 
         # Audit Execution role policy
-        if not len(self.report['policy']['role']['policies']):
-            self.track(self.report['arn'], {
-                'level': 'info',
-                'text': 'Execution Role policy is not defined'
-            })
+       
+        if self.report['policy']['role'] != "":
+            if not len(self.report['policy']['role']['policies']):
+                self.track(self.report['arn'], {
+                    'level': 'info',
+                    'text': 'Execution Role policy is not defined'
+                })
+            else:
+                for policy in self.report['policy']['role']['policies']:
+                    if 'Statement' in policy['document']:
+                        for statement in policy['document']['Statement']:
+                            for _ in PolicyStatement(statement, policy=policy).audit():
+                                self.track(self.report['role'], _)
         else:
-            for policy in self.report['policy']['role']['policies']:
-                if 'Statement' in policy['document']:
-                    for statement in policy['document']['Statement']:
-                        for _ in PolicyStatement(statement, policy=policy).audit():
-                            self.track(self.report['role'], _)
-
+            self.track(self.report['arn'], {
+                    'level': 'info',
+                    'text': 'Execution Role policy is not defined'
+                })
         # Audit KMS
         if 'kms' in self.report:
             self.item = KMS(

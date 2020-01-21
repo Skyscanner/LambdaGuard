@@ -52,10 +52,13 @@ class Statistics:
         Parses Lambda report and automatically extracts and
         tracks statistics.
         '''
+        
         self.statistics['lambdas'] += 1
-        self.statistics['layers'] += len(report['layers'])
+        if report['layers']:
+            self.statistics['layers'] += len(report['layers'])
         self.track('regions', report['region'])
         self.track('runtimes', report['runtime'])
+
         for idx in ['triggers', 'resources']:
             for arn in report[idx]['items']:
                 if arn == '*':

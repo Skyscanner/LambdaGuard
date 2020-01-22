@@ -114,12 +114,6 @@ def parse_args(arguments=''):
         version=__version__,
         help='Display current version'
     )
-    argsParser.add_argument(
-        '-a',
-        '--auditor',
-        action='store_true',
-        help='Run as an auditor - doesn\'t use lambda:GetFunction permission'
-    )
 
     if len(arguments):
         args = argsParser.parse_known_args(arguments.split())[0]

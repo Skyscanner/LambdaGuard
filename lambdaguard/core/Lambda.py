@@ -26,6 +26,7 @@ class Lambda(AWS):
         super().__init__(arn, args[0].profile, args[0].keys[0], args[0].keys[1])
 
         self.args = args[0]
+        self.identity = args[1]
         self.runtime = None
         self.handler = None
         self.layers = None
@@ -38,7 +39,7 @@ class Lambda(AWS):
         self.resources = {'services': [], 'items': {}}
         self.security = {'count': {}, 'items': {}}
 
-        self.get_function(self.args.auditor)
+        self.get_function()
         self.get_policy()
         self.get_triggers()
         self.get_resources()
@@ -54,18 +55,24 @@ class Lambda(AWS):
         except Exception:
             debug(self.arn.full)
 
-    def get_function(self, auditor=False):
+    def get_function(self):
         '''
         Fetches Lambda function configuration
         '''
         try:
-            if auditor:  # An auditor does not have access to the code, only to the configuration
-                config = self.client.get_function_configuration(FunctionName=self.arn.resource)
-                self.codeURL = ''
-            else:
-                function = self.client.get_function(FunctionName=self.arn.resource)
+            if self.identity.acl.allowed("lambda:GetFunction"):
+                function = self.client.get_function(
+                    FunctionName=self.arn.resource
+                )
                 config = function['Configuration']
                 self.codeURL = function['Code']['Location']
+            elif self.identity.acl.allowed("lambda:GetFunctionConfiguration"):
+                config = self.client.get_function_configuration(
+                    FunctionName=self.arn.resource
+                )
+                self.codeURL = ''
+            else:
+                exit("\nMissing both lambda:GetFunction and lambda:GetFunctionConfiguration")
 
             self.runtime = config['Runtime']
             self.handler = config['Handler']

@@ -62,11 +62,12 @@ def run(arguments=''):
     rmtree(args.output, ignore_errors=True)
     Path(args.output).mkdir(parents=True, exist_ok=True)
     configure_log(args.output)
+    identity = STS(f'arn:aws:sts:{args.region}', args.profile, args.keys[0], args.keys[1])
+
     if args.verbose:
-        identity = STS(f'arn:aws:sts:{args.region}', args.profile, args.keys[0], args.keys[1]).identity
         print(header, end='\n\n')
         for _ in ['UserId', 'Account', 'Arn']:
-            align(_, identity[_], orange)
+            align(_, identity.caller[_], orange)
         print('')
 
     statistics = Statistics(args.output)
@@ -79,7 +80,7 @@ def run(arguments=''):
             if args.verbose:
                 count = '[' + f'{statistics.statistics["lambdas"]+1}'.rjust(4, ' ') + '] '
                 print(f'\r{green}{count}{arn.resource}{nocolor}'.ljust(100, ' '), end='')
-            lmbd = Lambda(arn.full, args)
+            lmbd = Lambda(arn.full, args, identity)
             for w in writes.get_for_lambda(arn.full):
                 lmbd.set_writes(w)
             statistics.parse(lmbd.report())

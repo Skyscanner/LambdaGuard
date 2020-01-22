@@ -1,5 +1,5 @@
 """
-Copyright 2019 Skyscanner Ltd
+Copyright 2020 Skyscanner Ltd
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License.
@@ -113,12 +113,6 @@ def parse_args(arguments=''):
         action='version',
         version=__version__,
         help='Display current version'
-    )
-    argsParser.add_argument(
-        '-a',
-        '--auditor',
-        action='store_true',
-        help='Run as an auditor - doesn\'t use lambda:GetFunction permission'
     )
 
     if len(arguments):

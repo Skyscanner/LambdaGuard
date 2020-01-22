@@ -12,6 +12,7 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
+from lambdaguard.utils.arnparse import arnparse
 from lambdaguard.utils.log import debug
 from lambdaguard.core.AWS import AWS
 
@@ -20,13 +21,14 @@ class STS(AWS):
     def __init__(self, arn, profile=None, access_key_id=None, secret_access_key=None):
         super().__init__(arn, profile, access_key_id, secret_access_key)
         self.get_caller_identity()
-        self.info = f''
+        self.info = f""
 
     def get_caller_identity(self):
         '''
         Fetches STS Caller Identity
         '''
         try:
-            self.identity = self.client.get_caller_identity()
+            self.caller = self.client.get_caller_identity()
+            self.arn = arnparse(self.caller['Arn'])
         except Exception:
             exit(print(debug(self.arn.full)))

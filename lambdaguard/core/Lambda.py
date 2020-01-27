@@ -192,9 +192,7 @@ class Lambda(AWS):
             debug(self.arn.full)
 
     def report(self):
-
         ret = {
-            
             'name': self.arn.resource,
             'description': self.description,
             'region': self.arn.region,
@@ -210,10 +208,8 @@ class Lambda(AWS):
             'triggers': self.triggers,
             'resources': self.resources,
             'security': self.security,
-            'role':""
+            'role': ""
         }
-
-       
 
         if self.policy:
             ret['policy']['function'] = self.policy
@@ -221,13 +217,11 @@ class Lambda(AWS):
             if self.role.arn:
                 ret['role'] = self.role.arn.full
             if self.role.policy:
-                ret['policy']['role'] = self.role.policy    
+                ret['policy']['role'] = self.role.policy
         if self.arn:
             ret['arn'] = self.arn.full
-            
-
-       
         if self.kms:
             ret['kms'] = self.kms.arn.full
             ret['policy']['kms'] = self.kms.policies
+
         return ret

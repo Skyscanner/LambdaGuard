@@ -52,7 +52,6 @@ class Statistics:
         Parses Lambda report and automatically extracts and
         tracks statistics.
         '''
-        
         self.statistics['lambdas'] += 1
         if report['layers']:
             self.statistics['layers'] += len(report['layers'])

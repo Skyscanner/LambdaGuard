@@ -59,6 +59,11 @@ def arnparse(arn_str):
 
     if service == 'iam':
         resource_type = '/'.join(elements[5].split('/')[:-1])  # role type
+    elif service == 'sts':
+        res = elements[5].split('/')
+        if len(res) > 1:
+            resource_type = res[0]  # assumed-role
+            resource = res[1]  # group
     elif service == 'dynamodb':
         resource_type = elements[5].split('/')[0]  # table
         resource = elements[5].split('/')[1]  # table name

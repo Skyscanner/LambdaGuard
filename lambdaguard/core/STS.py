@@ -32,4 +32,4 @@ class STS(AWS):
         try:
             return self.client.get_caller_identity()
         except Exception:
-            exit(print(debug(self.arn.full)))
+            debug(self.arn.full)

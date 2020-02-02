@@ -29,22 +29,74 @@ from lambdaguard.security.LambdaWrite import LambdaWrite
 from lambdaguard.security.Report import SecurityReport
 
 
+def verbose(args, message, end=''):
+    '''
+    Prints formatted message if verbose mode is set
+    '''
+    if args.verbose:
+        print(
+            f'\r{green}{message}{nocolor}'.ljust(100, ' '),
+            end=end
+        )
+
+
+def get_client(args):
+    '''
+    Return a Lambda client
+    '''
+    return boto3.Session(
+        profile_name=args.profile,
+        aws_access_key_id=args.keys[0],
+        aws_secret_access_key=args.keys[1],
+        region_name=args.region
+    ).client('lambda')
+
+
+def get_regions(args):
+    '''
+    Valid region specification:
+        Single:     eu-west-1
+        Multiple:   eu-west-1,ap-south-1,us-east-2
+        All:        all
+    Returns regions as a Python list
+    '''
+    available = boto3.Session().get_available_regions('lambda')
+    if args.region == 'all':
+        return available
+    regions = args.region.split(',')
+    if not regions:
+        raise ValueError(f'No region specified')
+    for region in regions:
+        if region not in available:
+            raise ValueError(f'Invalid region "{region}"')
+    return regions
+
+
+def get_usage(args):
+    usage = {}
+    for region in get_regions(args):
+        args.region = region
+        verbose(args, f'Loading regions ({region})')
+        try:
+            client = get_client(args)
+            settings = client.get_account_settings()
+            function_count = settings['AccountUsage']['FunctionCount']
+            if function_count:
+                usage[region] = function_count
+        except Exception:
+            debug(region)
+    return usage
+
+
 def get_functions(args):
     if args.function:
         yield args.function
-
     elif args.input:
         with Path(args.input).open() as f:
             for _ in f.read().split('\n'):
                 yield _
-
     else:
-        client = boto3.Session(
-            profile_name=args.profile,
-            aws_access_key_id=args.keys[0],
-            aws_secret_access_key=args.keys[1],
-            region_name=args.region
-        ).client('lambda')
+        client = get_client(args)
         for page in paginate(client, 'list_functions'):
             for function in page['Functions']:
                 yield function['FunctionArn']
@@ -53,19 +105,21 @@ def get_functions(args):
 def run(arguments=''):
     args = parse_args(arguments)
 
+    verbose(args, header, end='\n\n')
+
     if args.html:
         HTMLReport(args.output).save()
-        if args.verbose:
-            print(f'HTML report saved to {args.output}/report.html')
+        verbose(args, f'Generated {args.output}/report.html', end='\n\n')
         exit(0)
 
     rmtree(args.output, ignore_errors=True)
     Path(args.output).mkdir(parents=True, exist_ok=True)
     configure_log(args.output)
-    identity = STS(f'arn:aws:sts:{args.region}', args.profile, args.keys[0], args.keys[1])
-
+    usage = get_usage(args)
+    verbose(args, f'Loading identity')
+    sts_arn = f'arn:aws:sts:{list(usage.keys())[0]}'
+    identity = STS(sts_arn, args.profile, args.keys[0], args.keys[1])
     if args.verbose:
-        print(header, end='\n\n')
         for _ in ['UserId', 'Account', 'Arn']:
             align(_, identity.caller[_], orange)
         print('')
@@ -73,20 +127,24 @@ def run(arguments=''):
     statistics = Statistics(args.output)
     visibility = VisibilityReport(args.output)
     writes = LambdaWrite(args)
+    total_count = 0
+    for region_count in usage.values():
+        total_count += region_count
 
-    for arn_str in get_functions(args):
-        try:
-            arn = arnparse(arn_str)
-            if args.verbose:
-                count = '[' + f'{statistics.statistics["lambdas"]+1}'.rjust(4, ' ') + '] '
-                print(f'\r{green}{count}{arn.resource}{nocolor}'.ljust(100, ' '), end='')
-            lmbd = Lambda(arn.full, args, identity)
-            for w in writes.get_for_lambda(arn.full):
-                lmbd.set_writes(w)
-            statistics.parse(lmbd.report())
-            visibility.save(lmbd.report())
-        except Exception:
-            debug(arn_str)
+    for region in usage.keys():
+        args.region = region
+        for arn_str in get_functions(args):
+            try:
+                arn = arnparse(arn_str)
+                counter = f'[ {statistics.statistics["lambdas"]+1}/{total_count} ] '
+                verbose(args, f'{counter}{arn.resource}')
+                lmbd = Lambda(arn.full, args, identity)
+                for w in writes.get_for_lambda(arn.full):
+                    lmbd.set_writes(w)
+                statistics.parse(lmbd.report())
+                visibility.save(lmbd.report())
+            except Exception:
+                debug(arn_str)
 
     SecurityReport(args.output).save()
     HTMLReport(args.output).save()
@@ -103,4 +161,4 @@ def run(arguments=''):
         print('')
         align('Report', f'{args.output}/report.html')
         align('Log', f'{args.output}/lambdaguard.log')
-        print('\n')
+        print('')

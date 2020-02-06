@@ -42,7 +42,7 @@ def verbose(args, message, end=''):
 
 def get_client(args):
     '''
-    Return a Lambda client
+    Returns a Lambda botocore client
     '''
     return boto3.Session(
         profile_name=args.profile,
@@ -60,6 +60,8 @@ def get_regions(args):
         All:        all
     Returns regions as a Python list
     '''
+    if not isinstance(args.region, str):
+        raise ValueError(f'No region specified')
     available = boto3.Session().get_available_regions('lambda')
     if args.region == 'all':
         return available
@@ -73,6 +75,9 @@ def get_regions(args):
 
 
 def get_usage(args):
+    '''
+    Returns Python dict with number of Lambdas per region
+    '''
     usage = {}
     for region in get_regions(args):
         args.region = region
@@ -89,6 +94,10 @@ def get_usage(args):
 
 
 def get_functions(args):
+    '''
+    Generator for listing Lambda functions
+    Yields Lambda function ARNs
+    '''
     if args.function:
         yield args.function
     elif args.input:
@@ -103,6 +112,9 @@ def get_functions(args):
 
 
 def run(arguments=''):
+    '''
+    Main routine
+    '''
     args = parse_args(arguments)
 
     verbose(args, header, end='\n\n')

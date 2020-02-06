@@ -93,7 +93,7 @@ def parse_args(arguments=''):
     argsParser.add_argument(
         '-r',
         '--region',
-        default='eu-west-1',
+        default='all',
         help='AWS region'
     )
     argsParser.add_argument(
@@ -125,6 +125,7 @@ def parse_args(arguments=''):
 
 def align(key, value, color=green):
     ret = (
+        '\r' +
         ' ' * 10 +
         color +
         f'{key}'.ljust(15, '.') +

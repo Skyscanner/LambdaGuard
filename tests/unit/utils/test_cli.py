@@ -35,7 +35,7 @@ class Test(unittest.TestCase):
         self.assertEqual(args.output, 'lambdaguard_output')
         self.assertIsNone(args.profile)
         self.assertEqual(args.keys, [None, None])
-        self.assertEqual(args.region, 'eu-west-1')
+        self.assertEqual(args.region, 'all')
         self.assertIsNone(args.sonarqube)
         self.assertFalse(args.verbose)
         self.assertFalse(args.html)
@@ -47,5 +47,5 @@ class Test(unittest.TestCase):
         self.assertTrue(args.verbose)
 
     def test_align(self):
-        expected = '          \x1b[0;32mkey............ value\x1b[0m'
+        expected = '\r          \x1b[0;32mkey............ value\x1b[0m'
         self.assertEqual(align('key', 'value', green), expected)

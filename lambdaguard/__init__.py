@@ -129,7 +129,9 @@ def run(arguments=''):
     configure_log(args.output)
     usage = get_usage(args)
     verbose(args, f'Loading identity')
-    sts_arn = f'arn:aws:sts:{list(usage.keys())[0]}'
+    used_regions = list(usage.keys())
+    region = used_regions[0] if len(used_regions) else args.region
+    sts_arn = f'arn:aws:sts:{region}'
     identity = STS(sts_arn, args.profile, args.keys[0], args.keys[1])
     if args.verbose:
         for _ in ['UserId', 'Account', 'Arn']:

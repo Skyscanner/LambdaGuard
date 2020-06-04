@@ -23,7 +23,7 @@ class STS(AWS):
         super().__init__(arn, profile, access_key_id, secret_access_key)
         self.caller = self.get_caller_identity()
         self.arn = arnparse(self.caller['Arn'])
-        self.acl = ACL(self.caller['Arn'])
+        self.acl = ACL(self.caller['Arn'], profile, access_key_id, secret_access_key)
 
     def get_caller_identity(self):
         '''

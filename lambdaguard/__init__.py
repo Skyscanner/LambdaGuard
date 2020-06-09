@@ -61,7 +61,7 @@ def get_regions(args):
     Returns regions as a Python list
     '''
     if not isinstance(args.region, str):
-        raise ValueError(f'No region specified')
+        raise ValueError('No region specified')
     if args.function:
         return [arnparse(args.function).region]
     available = boto3.Session().get_available_regions('lambda')
@@ -69,7 +69,7 @@ def get_regions(args):
         return available
     regions = args.region.split(',')
     if not regions:
-        raise ValueError(f'No region specified')
+        raise ValueError('No region specified')
     for region in regions:
         if region not in available:
             raise ValueError(f'Invalid region "{region}"')
@@ -130,7 +130,7 @@ def run(arguments=''):
     Path(args.output).mkdir(parents=True, exist_ok=True)
     configure_log(args.output)
     usage = get_usage(args)
-    verbose(args, f'Loading identity')
+    verbose(args, 'Loading identity')
     region = list(usage.keys())[0]
     sts_arn = f'arn:aws:sts:{region}'
     identity = STS(sts_arn, args.profile, args.keys[0], args.keys[1])

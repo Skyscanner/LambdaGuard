@@ -14,6 +14,7 @@ specific language governing permissions and limitations under the License.
 """
 import json
 from pathlib import Path
+
 from lambdaguard.utils.arnparse import arnparse
 
 
@@ -21,17 +22,17 @@ class Statistics:
     def __init__(self, path):
         self.path = Path(path)
         self.statistics = {
-            'lambdas': 0,
-            'layers': 0,
-            'regions': {'count': 0, 'items': {}},
-            'runtimes': {'count': 0, 'items': {}},
-            'triggers': {'count': 0, 'items': {}},
-            'resources': {'count': 0, 'items': {}},
-            'security': {'count': 0, 'items': {}}
+            "lambdas": 0,
+            "layers": 0,
+            "regions": {"count": 0, "items": {}},
+            "runtimes": {"count": 0, "items": {}},
+            "triggers": {"count": 0, "items": {}},
+            "resources": {"count": 0, "items": {}},
+            "security": {"count": 0, "items": {}},
         }
 
     def track(self, idx, value, count=1):
-        '''
+        """
         Tracks number of occurences of a given value
         under a given Statistics dictionary index.
         Optionally, specify how many occurences to count.
@@ -39,37 +40,37 @@ class Statistics:
 
         @param  idx     Index in Statistics dictionary
         @param  value   Value
-        '''
-        self.statistics[idx]['count'] += count
+        """
+        self.statistics[idx]["count"] += count
 
-        if value not in self.statistics[idx]['items']:
-            self.statistics[idx]['items'][value] = count
+        if value not in self.statistics[idx]["items"]:
+            self.statistics[idx]["items"][value] = count
         else:
-            self.statistics[idx]['items'][value] += count
+            self.statistics[idx]["items"][value] += count
 
     def parse(self, report, verbose=False):
-        '''
+        """
         Parses Lambda report and automatically extracts and
         tracks statistics.
-        '''
-        self.statistics['lambdas'] += 1
-        self.statistics['layers'] += len(report['layers'])
-        self.track('regions', report['region'])
-        self.track('runtimes', report['runtime'])
-        for idx in ['triggers', 'resources']:
-            for arn in report[idx]['items']:
-                if arn == '*':
+        """
+        self.statistics["lambdas"] += 1
+        self.statistics["layers"] += len(report["layers"])
+        self.track("regions", report["region"])
+        self.track("runtimes", report["runtime"])
+        for idx in ["triggers", "resources"]:
+            for arn in report[idx]["items"]:
+                if arn == "*":
                     continue
                 self.track(idx, arnparse(arn).service)
-        if 'count' in report['security']:
-            for level, level_count in report['security']['count'].items():
-                self.track('security', level, level_count)
+        if "count" in report["security"]:
+            for level, level_count in report["security"]["count"].items():
+                self.track("security", level, level_count)
 
         self.save(verbose=verbose)
 
     def save(self, verbose=False):
         stats = json.dumps(self.statistics, indent=4)
-        with self.path.joinpath('statistics.json').open('w') as f:
+        with self.path.joinpath("statistics.json").open("w") as f:
             f.write(stats)
         if verbose:
             print(stats)

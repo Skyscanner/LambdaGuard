@@ -21,32 +21,32 @@ class PrivilegeEscalation:
     def audit(self):
         exploitable = []
         iam = [
-            'iam:*',
-            'iam:AddUserToGroup',
-            'iam:AttachGroupPolicy',
-            'iam:AttachRolePolicy',
-            'iam:AttachUserPolicy',
-            'iam:CodeStarCreateProjectFromTemplate',
-            'iam:CodeStarCreateProjectThenAssociateTeamMember',
-            'iam:CreateAccessKey',
-            'iam:CreateEC2WithExistingIP',
-            'iam:CreateLoginProfile',
-            'iam:CreateNewPolicyVersion',
-            'iam:EditExistingLambdaFunctionWithRole',
-            'iam:PassExistingRoleToNewCloudFormation',
-            'iam:PassExistingRoleToNewCodeStarProject',
-            'iam:PassExistingRoleToNewDataPipeline',
-            'iam:PassExistingRoleToNewGlueDevEndpoint',
-            'iam:PassExistingRoleToNewLambdaThenInvoke',
-            'iam:PassExistingRoleToNewLambdaThenTriggerWithExistingDynamo',
-            'iam:PassExistingRoleToNewLambdaThenTriggerWithNewDynamo',
-            'iam:PutGroupPolicy',
-            'iam:PutRolePolicy',
-            'iam:PutUserPolicy',
-            'iam:SetExistingDefaultPolicyVersion',
-            'iam:UpdateExistingGlueDevEndpoint',
-            'iam:UpdateLoginProfile',
-            'iam:UpdateRolePolicyToAssumeIt'
+            "iam:*",
+            "iam:AddUserToGroup",
+            "iam:AttachGroupPolicy",
+            "iam:AttachRolePolicy",
+            "iam:AttachUserPolicy",
+            "iam:CodeStarCreateProjectFromTemplate",
+            "iam:CodeStarCreateProjectThenAssociateTeamMember",
+            "iam:CreateAccessKey",
+            "iam:CreateEC2WithExistingIP",
+            "iam:CreateLoginProfile",
+            "iam:CreateNewPolicyVersion",
+            "iam:EditExistingLambdaFunctionWithRole",
+            "iam:PassExistingRoleToNewCloudFormation",
+            "iam:PassExistingRoleToNewCodeStarProject",
+            "iam:PassExistingRoleToNewDataPipeline",
+            "iam:PassExistingRoleToNewGlueDevEndpoint",
+            "iam:PassExistingRoleToNewLambdaThenInvoke",
+            "iam:PassExistingRoleToNewLambdaThenTriggerWithExistingDynamo",
+            "iam:PassExistingRoleToNewLambdaThenTriggerWithNewDynamo",
+            "iam:PutGroupPolicy",
+            "iam:PutRolePolicy",
+            "iam:PutUserPolicy",
+            "iam:SetExistingDefaultPolicyVersion",
+            "iam:UpdateExistingGlueDevEndpoint",
+            "iam:UpdateLoginProfile",
+            "iam:UpdateRolePolicyToAssumeIt",
         ]
 
         for action in self.item:
@@ -54,8 +54,8 @@ class PrivilegeEscalation:
                 exploitable.append(action)
 
         if len(exploitable):
-            exploitable = ', '.join(exploitable)
+            exploitable = ", ".join(exploitable)
             yield {
-                'level': 'high',
-                'text': f'Potential privilege escalation via the following Actions: {exploitable}'
+                "level": "high",
+                "text": f"Potential privilege escalation via the following Actions: {exploitable}",
             }

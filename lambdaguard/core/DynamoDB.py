@@ -12,8 +12,8 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-from lambdaguard.utils.log import debug
 from lambdaguard.core.AWS import AWS
+from lambdaguard.utils.log import debug
 
 
 class DynamoDB(AWS):
@@ -25,12 +25,12 @@ class DynamoDB(AWS):
         self.describe_table()
 
     def describe_table(self):
-        '''
+        """
         Fetches DynamoDB table metadata
-        '''
+        """
         try:
-            table = self.client.describe_table(TableName=self.arn.resource)['Table']
-            if 'SSEDescription' in table:
-                self.encryption = table['SSEDescription']
+            table = self.client.describe_table(TableName=self.arn.resource)["Table"]
+            if "SSEDescription" in table:
+                self.encryption = table["SSEDescription"]
         except Exception:
             debug(self.arn.full)

@@ -20,20 +20,17 @@ class AccessControlList:
 
     def audit(self):
         uris = {
-            'http://acs.amazonaws.com/groups/global/AllUsers': 'Everyone',
-            'http://acs.amazonaws.com/groups/global/AuthenticatedUsers': 'Authenticated AWS users'
+            "http://acs.amazonaws.com/groups/global/AllUsers": "Everyone",
+            "http://acs.amazonaws.com/groups/global/AuthenticatedUsers": "Authenticated AWS users",
         }
 
         if not self.acl:
-            yield {
-                'level': 'info',
-                'text': 'Bucket ACL is not defined'
-            }
+            yield {"level": "info", "text": "Bucket ACL is not defined"}
         else:
-            for acl in self.acl['Grants']:
-                if acl['Grantee']['Type'] == 'Group':
-                    if acl['Grantee']['URI'] in uris:
+            for acl in self.acl["Grants"]:
+                if acl["Grantee"]["Type"] == "Group":
+                    if acl["Grantee"]["URI"] in uris:
                         yield {
-                            'level': 'high',
-                            'text': f'Public Bucket ACL: {acl["Permission"]} access for {uris[acl["Grantee"]["URI"]]}'
+                            "level": "high",
+                            "text": f'Public Bucket ACL: {acl["Permission"]} access for {uris[acl["Grantee"]["URI"]]}',
                         }

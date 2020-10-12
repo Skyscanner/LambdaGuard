@@ -12,8 +12,8 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-from lambdaguard.utils.log import debug
 from lambdaguard.core.AWS import AWS
+from lambdaguard.utils.log import debug
 
 
 class Role(AWS):
@@ -23,44 +23,36 @@ class Role(AWS):
         self.get_policy()
 
     def get_policy(self):
-        '''
+        """
         Fetches attached and inline policies
-        '''
-        self.policy = {
-            'roleName': self.arn.resource,
-            'policies': []
-        }
+        """
+        self.policy = {"roleName": self.arn.resource, "policies": []}
 
         # Collect attached policies
         try:
             policies = self.client.list_attached_role_policies(RoleName=self.arn.resource)
-            for attached in policies['AttachedPolicies']:
-                info = self.client.get_policy(PolicyArn=attached['PolicyArn'])
+            for attached in policies["AttachedPolicies"]:
+                info = self.client.get_policy(PolicyArn=attached["PolicyArn"])
                 policy = self.client.get_policy_version(
-                    PolicyArn=attached['PolicyArn'],
-                    VersionId=info['Policy']['DefaultVersionId']
-                )['PolicyVersion']['Document']
-                self.policy['policies'].append({
-                    'document': policy,
-                    'name': attached['PolicyName'],
-                    'arn': attached['PolicyArn'],
-                    'type': 'managed'
-                })
+                    PolicyArn=attached["PolicyArn"],
+                    VersionId=info["Policy"]["DefaultVersionId"],
+                )["PolicyVersion"]["Document"]
+                self.policy["policies"].append(
+                    {
+                        "document": policy,
+                        "name": attached["PolicyName"],
+                        "arn": attached["PolicyArn"],
+                        "type": "managed",
+                    }
+                )
         except Exception:
             debug(self.arn.full)
 
         # Collect inline policies
         try:
             policies = self.client.list_role_policies(RoleName=self.arn.resource)
-            for name in policies['PolicyNames']:
-                policy = self.client.get_role_policy(
-                    RoleName=self.arn.resource,
-                    PolicyName=name
-                )['PolicyDocument']
-                self.policy['policies'].append({
-                    'document': policy,
-                    'name': name,
-                    'type': 'inline'
-                })
+            for name in policies["PolicyNames"]:
+                policy = self.client.get_role_policy(RoleName=self.arn.resource, PolicyName=name)["PolicyDocument"]
+                self.policy["policies"].append({"document": policy, "name": name, "type": "inline"})
         except Exception:
             debug(self.arn.full)

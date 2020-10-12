@@ -13,8 +13,9 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 import json
-from lambdaguard.utils.log import debug
+
 from lambdaguard.core.AWS import AWS
+from lambdaguard.utils.log import debug
 
 
 class SNS(AWS):
@@ -24,12 +25,10 @@ class SNS(AWS):
         self.get_topic_attributes()
 
     def get_topic_attributes(self):
-        '''
+        """
         Fetches SNS Topic attributes
-        '''
+        """
         try:
-            self.policy = json.loads(
-                self.client.get_topic_attributes(TopicArn=self.arn.full)['Attributes']['Policy']
-            )
+            self.policy = json.loads(self.client.get_topic_attributes(TopicArn=self.arn.full)["Attributes"]["Policy"])
         except Exception:
             debug(self.arn.full)

@@ -13,15 +13,16 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 import unittest
-import json
 from pathlib import Path
 from sys import argv
-from lambdaguard.utils.cli import *
+
+from lambdaguard.utils.cli import align, green, parse_args
+
 
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.fixtures = Path(__file__).parents[2].joinpath('fixtures')
+        cls.fixtures = Path(__file__).parents[2].joinpath("fixtures")
 
     def test_parse_args(self):
         # Reset sys.argv
@@ -32,20 +33,20 @@ class Test(unittest.TestCase):
         args = parse_args()
         self.assertIsNone(args.function)
         self.assertIsNone(args.input)
-        self.assertEqual(args.output, 'lambdaguard_output')
+        self.assertEqual(args.output, "lambdaguard_output")
         self.assertIsNone(args.profile)
         self.assertEqual(args.keys, [None, None])
-        self.assertEqual(args.region, 'all')
+        self.assertEqual(args.region, "all")
         self.assertIsNone(args.sonarqube)
         self.assertFalse(args.verbose)
         self.assertFalse(args.html)
         # Parse custom arguments
-        args = parse_args('-o output -v -f function -k id secret')
-        self.assertEqual(args.output, 'output')
-        self.assertEqual(args.function, 'function')
-        self.assertEqual(args.keys, ['id', 'secret'])
+        args = parse_args("-o output -v -f function -k id secret")
+        self.assertEqual(args.output, "output")
+        self.assertEqual(args.function, "function")
+        self.assertEqual(args.keys, ["id", "secret"])
         self.assertTrue(args.verbose)
 
     def test_align(self):
-        expected = '\r          \x1b[0;32mkey............ value\x1b[0m'
-        self.assertEqual(align('key', 'value', green), expected)
+        expected = "\r          \x1b[0;32mkey............ value\x1b[0m"
+        self.assertEqual(align("key", "value", green), expected)

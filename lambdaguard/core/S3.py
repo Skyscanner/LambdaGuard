@@ -13,8 +13,9 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 import json
-from lambdaguard.utils.log import debug
+
 from lambdaguard.core.AWS import AWS
+from lambdaguard.utils.log import debug
 
 
 class S3(AWS):
@@ -29,33 +30,33 @@ class S3(AWS):
         self.get_bucket_encryption()
 
         self.info = (
-            f'http://{self.arn.resource}.s3.amazonaws.com\n\n' +
-            f'https://console.aws.amazon.com/s3/buckets/{self.arn.resource}/?tab=permissions'
+            f"http://{self.arn.resource}.s3.amazonaws.com\n\n"
+            + f"https://console.aws.amazon.com/s3/buckets/{self.arn.resource}/?tab=permissions"
         )
 
     def get_bucket_policy(self):
-        '''
+        """
         Fetches S3 Bucket (Resource-based) policy
-        '''
+        """
         try:
             policy = self.client.get_bucket_policy(Bucket=self.arn.resource)
-            self.policy = json.loads(policy['Policy'])
+            self.policy = json.loads(policy["Policy"])
         except Exception:
             debug(self.arn.full)
 
     def get_bucket_acl(self):
-        '''
+        """
         Fetches S3 Bucket (Resource-based) Access Control List
-        '''
+        """
         try:
             self.acl = self.client.get_bucket_acl(Bucket=self.arn.resource)
         except Exception:
             debug(self.arn.full)
 
     def get_bucket_encryption(self):
-        '''
+        """
         Fetches S3 Bucket encryption settings
-        '''
+        """
         try:
             self.encryption = self.client.get_bucket_encryption(Bucket=self.arn.resource)
         except Exception:

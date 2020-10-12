@@ -22,15 +22,10 @@ def paginate(client, paginator, **kwargs):
     marker = None
     while True:
         pages = client.get_paginator(paginator).paginate(
-            **kwargs,
-            PaginationConfig={
-                'MaxItems': 10,
-                'PageSize': 10,
-                'StartingToken': marker
-            }
+            **kwargs, PaginationConfig={"MaxItems": 10, "PageSize": 10, "StartingToken": marker}
         )
         for page in pages:
             yield page
-        if 'NextMarker' not in page:
+        if "NextMarker" not in page:
             break
-        marker = page['NextMarker']
+        marker = page["NextMarker"]

@@ -13,28 +13,29 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 import json
-from lambdaguard.utils.log import debug
+
 from lambdaguard.core.AWS import AWS
+from lambdaguard.utils.log import debug
 
 
 class SQS(AWS):
     def __init__(self, arn, profile=None, access_key_id=None, secret_access_key=None):
         super().__init__(arn, profile, access_key_id, secret_access_key)
 
-        self.url = ''
+        self.url = ""
 
         self.get_queue_attributes()
 
-        self.info = f'{self.url}'
+        self.info = f"{self.url}"
 
     def get_queue_attributes(self):
-        '''
+        """
         Fetches SQS Queue attributes
-        '''
+        """
         try:
-            self.url = f'https://{self.arn.region}.queue.amazonaws.com/{self.arn.account_id}/{self.arn.resource}'
-            policy = self.client.get_queue_attributes(QueueUrl=self.url, AttributeNames=['Policy'])
-            if 'Attributes' in policy:
-                self.policy = json.loads(policy['Attributes']['Policy'])
+            self.url = f"https://{self.arn.region}.queue.amazonaws.com/{self.arn.account_id}/{self.arn.resource}"
+            policy = self.client.get_queue_attributes(QueueUrl=self.url, AttributeNames=["Policy"])
+            if "Attributes" in policy:
+                self.policy = json.loads(policy["Attributes"]["Policy"])
         except Exception:
             debug(self.arn.full)

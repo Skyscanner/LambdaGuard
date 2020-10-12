@@ -13,13 +13,15 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
 import boto3
+
 from lambdaguard.utils.arnparse import arnparse
 
 
 class AWS(object):
-    '''
+    """
     Base AWS service object extended by each individual service class.
-    '''
+    """
+
     def __init__(self, arn, profile=None, access_key_id=None, secret_access_key=None):
         # AWS ARN
         self.arn = arnparse(arn)
@@ -33,7 +35,7 @@ class AWS(object):
         self.policy = {}
 
         # Additional service information
-        self.info = ''
+        self.info = ""
 
         # AWS connection
         session = boto3.Session(profile_name=self.profile)
@@ -41,5 +43,5 @@ class AWS(object):
             self.arn.service,
             region_name=self.arn.region,
             aws_access_key_id=access_key_id,
-            aws_secret_access_key=secret_access_key
+            aws_secret_access_key=secret_access_key,
         )

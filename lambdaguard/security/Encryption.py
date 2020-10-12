@@ -19,9 +19,9 @@ class Encryption:
         self.item = item
 
     def audit(self):
-        if self.item.arn.service in ['s3', 'dynamodb']:
+        if self.item.arn.service in ["s3", "dynamodb"]:
             if not self.item.encryption:
                 yield {
-                    'level': 'medium',
-                    'text': 'Objects are stored without encryption'
+                    "level": "medium",
+                    "text": "Objects are stored without encryption",
                 }

@@ -19,20 +19,20 @@ class Public:
         self.item = item
 
     def audit(self):
-        if self.item.arn.service == 'apigateway':
+        if self.item.arn.service == "apigateway":
             if self.item.policy:
                 return
 
             apiKeyRequired = False
             authorizationType = None
             for res in self.item.resources:
-                if res['apiKeyRequired']:
+                if res["apiKeyRequired"]:
                     apiKeyRequired = True
-                if res['authorizationType'] != 'NONE':
-                    authorizationType = res['authorizationType']
+                if res["authorizationType"] != "NONE":
+                    authorizationType = res["authorizationType"]
 
             if not apiKeyRequired and not authorizationType:
                 yield {
-                    'level': 'high',
-                    'text': 'Service is publicly accessible due to missing Resource-based policy'
+                    "level": "high",
+                    "text": "Service is publicly accessible due to missing Resource-based policy",
                 }

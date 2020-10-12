@@ -8,8 +8,20 @@ dev:
 	python3 -m venv dev
 	echo "\nNow run: \n\n. dev/bin/activate\n"
 
-lint:
-	flake8 lambdaguard/
+flake8-lint:
+	flake8 setup.py lambdaguard/ tests/
+
+isort-lint:
+	isort --check-only --recursive setup.py lambdaguard/ tests/
+
+black-lint:
+	black --check setup.py lambdaguard/ tests/
+
+lint: isort-lint black-lint flake8-lint
+
+format:
+	isort --recursive setup.py lambdaguard/ tests/
+	black setup.py lambdaguard/ tests/
 
 unit:
 	pytest --show-capture=all -v tests/unit

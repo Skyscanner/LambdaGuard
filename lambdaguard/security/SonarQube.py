@@ -100,7 +100,7 @@ class SonarQube:
                 break
 
         issues = json.loads(curl.get(f'{self.config["url"]}/api/issues/search?project={project_name}').text)["issues"]
-        # curl.post(f'{self.config["url"]}/api/projects/delete', data={"project": project_name})
+        curl.post(f'{self.config["url"]}/api/projects/delete', data={"project": project_name})
 
         for issue in issues:
             if issue["status"] != "OPEN":

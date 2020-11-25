@@ -9,19 +9,19 @@ dev:
 	echo "\nNow run: \n\n. dev/bin/activate\n"
 
 flake8-lint:
-	flake8 setup.py lambdaguard/ tests/
+	flake8 *.py lambdaguard/ tests/
 
 isort-lint:
-	isort --check-only --recursive setup.py lambdaguard/ tests/
+	isort --check-only --recursive *.py lambdaguard/ tests/
 
 black-lint:
-	black --check setup.py lambdaguard/ tests/
+	black --check *.py lambdaguard/ tests/
 
 lint: isort-lint black-lint flake8-lint
 
 format:
-	isort --recursive setup.py lambdaguard/ tests/
-	black setup.py lambdaguard/ tests/
+	isort --recursive *.py lambdaguard/ tests/
+	black *.py lambdaguard/ tests/
 
 unit:
 	pytest --show-capture=all -v tests/unit

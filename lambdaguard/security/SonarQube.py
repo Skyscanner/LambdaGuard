@@ -15,6 +15,7 @@ specific language governing permissions and limitations under the License.
 import json
 from os import chdir as cd
 from pathlib import Path
+from re import sub
 from shlex import split as shsplit
 from shutil import rmtree
 from subprocess import DEVNULL, check_call as sh
@@ -28,8 +29,8 @@ sonar.host.url={}
 sonar.login={}
 sonar.password={}
 sonar.language={}
-sonar.projectKey=lambdaguard
-sonar.projectName=lambdaguard
+sonar.projectKey={}
+sonar.projectName={}
 sonar.sourceEncoding=UTF-8
 sonar.sources=.
 sonar.java.binaries=.
@@ -50,7 +51,7 @@ class SonarQube:
     def __del__(self):
         rmtree(self.downloads, ignore_errors=True)
 
-    def scan(self, codeURL, runtime):
+    def scan(self, project_name, codeURL, runtime):
         if not self.config:
             return  # invalid config
         zippath = self.downloads.joinpath("lambda.zip")
@@ -64,26 +65,25 @@ class SonarQube:
             zf.extractall(self.downloads, members=[_])
 
         # Configure sonar-project.properties
-        if runtime.startswith("python"):
-            language = "py"
-        elif runtime.startswith("node"):
+        if runtime.startswith("node"):
             language = "js"
-        elif runtime.startswith("java"):
-            language = "java"
         else:
-            return  # unsupported language
+            language = sub(r"[^a-z]", "", runtime.lower())
         Path(self.downloads, "sonar-project.properties").write_text(
             SONAR_PROJECT_PROPERTIES.format(
                 self.config["url"],
                 self.config["login"],
                 self.config["password"],
                 language,
+                project_name,
+                project_name,
             )
         )
 
         # Run sonar-scanner
         cwd = Path(".").resolve()
         cd(self.downloads)
+        sh(shsplit("git init"), stdout=DEVNULL, stderr=DEVNULL)
         sh(shsplit(self.config["command"]), stdout=DEVNULL, stderr=DEVNULL)
         cd(cwd)
         rmtree(self.downloads, ignore_errors=True)
@@ -99,8 +99,8 @@ class SonarQube:
             if task["status"] in ["SUCCESS", "FAIL"]:
                 break
 
-        issues = json.loads(curl.get(f'{self.config["url"]}/api/issues/search?project=lambdaguard').text)["issues"]
-        curl.post(f'{self.config["url"]}/api/projects/delete', data={"project": "lambdaguard"})
+        issues = json.loads(curl.get(f'{self.config["url"]}/api/issues/search?project={project_name}').text)["issues"]
+        # curl.post(f'{self.config["url"]}/api/projects/delete', data={"project": project_name})
 
         for issue in issues:
             if issue["status"] != "OPEN":

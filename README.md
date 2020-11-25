@@ -13,7 +13,7 @@ LambdaGuard is an AWS Lambda auditing tool designed to create asset visibility a
 
 ## Requirements
 - Python 3.6+
-- Java 8+ (optional for SonarQube)
+- Java 11 (optional for SonarQube)
 
 ## Install
 
@@ -54,6 +54,9 @@ Alternatively, you can use the keys directly as CLI arguments (not recommended).
 
 ## SonarQube: Static Code Analysis
 
+### Download sonar-scanner-cli
+- https://github.com/SonarSource/sonar-scanner-cli
+
 ### Build SonarQube
 - `make sonarqube`
 
@@ -64,7 +67,7 @@ Config should have the following format:
 
 ```json
 {
-    "command": "java -jar /opt/sonar-scanner-cli.jar -X",
+    "command": "sonar-scanner -X",
     "url": "http://localhost:9000",
     "login": "admin",
     "password": "admin"

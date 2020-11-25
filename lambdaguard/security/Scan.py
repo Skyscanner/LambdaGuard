@@ -207,9 +207,9 @@ class Scan:
 
         # SonarQube
         if self.args.sonarqube:
-            self.scan_sonarqube(arn, self.report["codeURL"], self.report["runtime"])
+            self.scan_sonarqube(self.report["codeURL"], self.report["runtime"])
             for layer in self.report["layers"]:
-                self.scan_sonarqube(arn, layer["codeURL"], self.report["runtime"])
+                self.scan_sonarqube(layer["codeURL"], self.report["runtime"])
 
         # Sort findings by level
         sorted_items = []
@@ -226,6 +226,6 @@ class Scan:
                 for _ in PolicyStatement(statement).audit():
                     self.track(arn.full, _)
 
-    def scan_sonarqube(self, arn, codeURL, runtime):
-        for _ in self.sonarqube.scan(codeURL, runtime):
-            self.track(arn.full, _)
+    def scan_sonarqube(self, codeURL, runtime):
+        for _ in self.sonarqube.scan(self.report["name"], codeURL, runtime):
+            self.track(self.report["arn"], _)

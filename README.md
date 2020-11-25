@@ -2,7 +2,6 @@
 
 [![](https://img.shields.io/pypi/v/LambdaGuard.svg)](https://pypi.python.org/pypi/LambdaGuard/)
 [![](https://github.com/Skyscanner/LambdaGuard/workflows/build/badge.svg)](https://github.com/Skyscanner/LambdaGuard/actions)
-![](coverage.svg)
 [![](https://img.shields.io/github/issues/Skyscanner/LambdaGuard)](https://github.com/Skyscanner/LambdaGuard/issues)
 [![](https://img.shields.io/github/issues-pr/Skyscanner/LambdaGuard)](https://github.com/Skyscanner/LambdaGuard/pulls)
 [![](https://img.shields.io/pypi/dm/LambdaGuard)](https://img.shields.io/pypi/dm/LambdaGuard)

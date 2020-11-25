@@ -1,16 +1,18 @@
 # <img src="lambdaguard/assets/logo.png" width="40px" style="vertical-align:middle" alt="LambdaGuard" style=""> LambdaGuard
 
-[![](https://img.shields.io/pypi/v/lambdaguard.svg)](https://pypi.python.org/pypi/lambdaguard/)
-[![](https://img.shields.io/travis/Skyscanner/LambdaGuard)](https://travis-ci.org/Skyscanner/LambdaGuard)
+[![](https://img.shields.io/pypi/v/LambdaGuard.svg)](https://pypi.python.org/pypi/LambdaGuard/)
+[![](https://github.com/Skyscanner/LambdaGuard/workflows/build/badge.svg)](https://github.com/Skyscanner/LambdaGuard/actions)
+![](coverage.svg)
 [![](https://img.shields.io/github/issues/Skyscanner/LambdaGuard)](https://github.com/Skyscanner/LambdaGuard/issues)
 [![](https://img.shields.io/github/issues-pr/Skyscanner/LambdaGuard)](https://github.com/Skyscanner/LambdaGuard/pulls)
+[![](https://img.shields.io/pypi/dm/LambdaGuard)](https://img.shields.io/pypi/dm/LambdaGuard)
 
 AWS Lambda is an event-driven, serverless computing platform provided by Amazon Web Services. It is a computing service that runs code in response to events and automatically manages the computing resources required by that code. 
 
 LambdaGuard is an AWS Lambda auditing tool designed to create asset visibility and provide actionable results. It provides a meaningful overview in terms of statistical analysis, AWS service dependencies and configuration checks from the security perspective.
 
 ## Requirements
-- Python 3.6.3
+- Python 3.6+
 - Java 8+ (optional for SonarQube)
 
 ## Install

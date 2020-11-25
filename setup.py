@@ -43,6 +43,7 @@ dev_requires = [
     "pytest==6.1.1",
     "pytest-mock==3.3.1",
     "pip-tools==5.3.1",
+    "wheel>=0.34.2",
     "twine==3.2.0",
 ]
 

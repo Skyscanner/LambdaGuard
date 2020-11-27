@@ -117,6 +117,11 @@ def run(arguments=""):
     """
     args = parse_args(arguments)
 
+    # sqs_client = get_client(args, "sqs")
+    # a = sqs_client.list_queues()
+    # print(a)
+    # exit()
+
     verbose(args, header, end="\n\n")
 
     if args.html:

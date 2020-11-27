@@ -12,6 +12,7 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
+import json
 from pathlib import Path
 from shutil import rmtree
 
@@ -21,7 +22,7 @@ from lambdaguard.core.Lambda import Lambda
 from lambdaguard.core.STS import STS
 from lambdaguard.security.LambdaWrite import LambdaWrite
 from lambdaguard.security.Report import SecurityReport
-from lambdaguard.utils.arnparse import arnparse
+from lambdaguard.utils.arnparse import arnparse, sqs_url_to_arn
 from lambdaguard.utils.cli import align, green, header, nocolor, orange, parse_args
 from lambdaguard.utils.log import configure_log, debug
 from lambdaguard.utils.paginator import paginate
@@ -111,16 +112,25 @@ def get_functions(args):
                 yield function["FunctionArn"]
 
 
+def get_all_sqs(args) -> list:
+    client = get_client(args, "sqs")
+    arns = []
+    paginator = client.get_paginator("list_queues")
+    pages = paginator.paginate()
+    for page in pages:
+        for url in page["QueueUrls"]:
+            arn = sqs_url_to_arn(url)
+            if not arn:
+                continue
+            arns.append(arn)
+    return arns
+
+
 def run(arguments=""):
     """
     Main routine
     """
     args = parse_args(arguments)
-
-    # sqs_client = get_client(args, "sqs")
-    # a = sqs_client.list_queues()
-    # print(a)
-    # exit()
 
     verbose(args, header, end="\n\n")
 
@@ -163,6 +173,12 @@ def run(arguments=""):
                 visibility.save(lmbd.report())
             except Exception:
                 debug(arn_str)
+
+    if args.full:
+        assets = Path(args.output, "assets.json")
+        assets = json.loads(assets.read_text())
+        targets = list(set(get_all_sqs(args)) - set(assets))
+        print(targets)
 
     SecurityReport(args.output).save()
     HTMLReport(args.output).save()

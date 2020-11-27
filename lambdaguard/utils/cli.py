@@ -51,6 +51,7 @@ author = f"\033[3;32mDeveloped by Artëm Tsvetkov{green}"
 def parse_args(arguments=""):
     argsParser = argparse.ArgumentParser(description=author, usage=header, epilog=nocolor)
     inputArgs = argsParser.add_mutually_exclusive_group()
+    inputArgs.add_argument("-F", "--full", action="store_true", help="Audit all serverless assets")
     inputArgs.add_argument("-f", "--function", default=None, help="Lambda ARN")
     inputArgs.add_argument("-i", "--input", default=None, help="Input file with a list of ARNs")
     argsParser.add_argument("-o", "--output", default="lambdaguard_output", help="Output directory")

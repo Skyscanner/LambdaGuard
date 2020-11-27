@@ -12,6 +12,8 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
+from typing import Optional
+from urllib.parse import urlparse
 
 
 class ARN(object):
@@ -102,3 +104,13 @@ def arnparse(arn_str):
         resource_type=resource_type,
         resource=resource,
     )
+
+
+def sqs_url_to_arn(queue_url: str) -> Optional[str]:
+    try:
+        url = urlparse(queue_url)
+        region = url.netloc.split(".")[0]
+        _, account_id, queue_name = url.path.split("/", 3)
+        return f"arn:aws:sqs:{region}:{account_id}:{queue_name}"
+    except Exception:
+        return None

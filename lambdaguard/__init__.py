@@ -38,7 +38,7 @@ def verbose(args, message, end=""):
         print(f"\r{green}{message}{nocolor}".ljust(100, " "), end=end)
 
 
-def get_client(args):
+def get_client(args, client="lambda"):
     """
     Returns a Lambda botocore client
     """
@@ -47,7 +47,7 @@ def get_client(args):
         aws_access_key_id=args.keys[0],
         aws_secret_access_key=args.keys[1],
         region_name=args.region,
-    ).client("lambda")
+    ).client(client)
 
 
 def get_regions(args):

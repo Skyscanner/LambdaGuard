@@ -38,7 +38,7 @@ class SecurityReport:
                                 OUT.append(
                                     {
                                         "index": idx,
-                                        "lambda": lmbd_arn,
+                                        "arn": lmbd_arn,
                                         "where": _["where"],
                                         "level": _["level"],
                                         "text": _["text"],

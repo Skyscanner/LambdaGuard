@@ -116,7 +116,7 @@ class HTMLReport:
             html = html.replace("{level}", _["level"])
             html = html.replace("{text}", self.txt2html(_["text"]))
             html = html.replace("{where}", self.txt2html(_["where"]))
-            html = html.replace("{lambda}", _["lambda"])
+            html = html.replace("{arn}", _["arn"])
             vulns_html += f"{html}\n"
 
         with assets_path.joinpath("vulnlist.html").open() as f:

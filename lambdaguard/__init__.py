@@ -28,6 +28,7 @@ from lambdaguard.utils.paginator import paginate
 from lambdaguard.visibility.HTMLReport import HTMLReport
 from lambdaguard.visibility.Report import VisibilityReport
 from lambdaguard.visibility.Statistics import Statistics
+from lambdaguard.core.AWS import get_AWS_client
 
 
 def verbose(args, message, end=""):
@@ -42,13 +43,12 @@ def get_client(args):
     """
     Returns a Lambda botocore client
     """
-    return boto3.Session(
-        profile_name=args.profile,
-        aws_access_key_id=args.keys[0],
-        aws_secret_access_key=args.keys[1],
-        region_name=args.region,
-    ).client("lambda")
-
+    return get_AWS_client(
+        args.profile,
+        args.keys[0],
+        args.keys[1],
+        args.region,
+        "lambda")
 
 def get_regions(args):
     """

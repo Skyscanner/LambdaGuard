@@ -15,7 +15,7 @@ specific language governing permissions and limitations under the License.
 from lambdaguard.core.AWS import AWS
 from lambdaguard.utils.log import debug
 
-
+cachedPolicy = {}
 class Role(AWS):
     def __init__(self, arn, profile=None, access_key_id=None, secret_access_key=None):
         super().__init__(arn, profile, access_key_id, secret_access_key)
@@ -32,14 +32,15 @@ class Role(AWS):
         try:
             policies = self.client.list_attached_role_policies(RoleName=self.arn.resource)
             for attached in policies["AttachedPolicies"]:
-                info = self.client.get_policy(PolicyArn=attached["PolicyArn"])
-                policy = self.client.get_policy_version(
-                    PolicyArn=attached["PolicyArn"],
-                    VersionId=info["Policy"]["DefaultVersionId"],
-                )["PolicyVersion"]["Document"]
+                if not attached["PolicyArn"] in cachedPolicy:
+                    info = self.client.get_policy(PolicyArn=attached["PolicyArn"])
+                    cachedPolicy[attached["PolicyArn"]] = self.client.get_policy_version(
+                        PolicyArn=attached["PolicyArn"],
+                        VersionId=info["Policy"]["DefaultVersionId"],
+                    )["PolicyVersion"]["Document"]
                 self.policy["policies"].append(
                     {
-                        "document": policy,
+                        "document": cachedPolicy[attached["PolicyArn"]] ,
                         "name": attached["PolicyName"],
                         "arn": attached["PolicyArn"],
                         "type": "managed",
@@ -52,7 +53,8 @@ class Role(AWS):
         try:
             policies = self.client.list_role_policies(RoleName=self.arn.resource)
             for name in policies["PolicyNames"]:
-                policy = self.client.get_role_policy(RoleName=self.arn.resource, PolicyName=name)["PolicyDocument"]
-                self.policy["policies"].append({"document": policy, "name": name, "type": "inline"})
+                if not name in cachedPolicy:
+                    cachedPolicy[name] = self.client.get_role_policy(RoleName=self.arn.resource, PolicyName=name)["PolicyDocument"]
+                self.policy["policies"].append({"document": cachedPolicy[name], "name": name, "type": "inline"})
         except Exception:
             debug(self.arn.full)

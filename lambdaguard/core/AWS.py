@@ -12,10 +12,20 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
+import functools
 import boto3
 
 from lambdaguard.utils.arnparse import arnparse
 
+@functools.lru_cache()
+def get_AWS_client(profile_name, aws_access_key_id, aws_secret_access_key, region_name, service):
+    session = boto3.Session(profile_name=profile_name)
+    return session.client(
+        service,
+        region_name=region_name,
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,
+    )
 
 class AWS(object):
     """
@@ -38,10 +48,10 @@ class AWS(object):
         self.info = ""
 
         # AWS connection
-        session = boto3.Session(profile_name=self.profile)
-        self.client = session.client(
+        self.client = get_AWS_client(
+            self.profile,
+            access_key_id,
+            secret_access_key,
+            self.arn.region,
             self.arn.service,
-            region_name=self.arn.region,
-            aws_access_key_id=access_key_id,
-            aws_secret_access_key=secret_access_key,
         )

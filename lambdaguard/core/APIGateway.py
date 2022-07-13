@@ -27,9 +27,11 @@ class APIGateway(AWS):
         self.stages = []
         self.resources = []
 
-        self.get_api()
-
-        self.info = f"REST API ID: {self.rest_api_id}"
+        if self.arn.full.split(":")[2] == 'execute-api':
+            self.get_api()
+            self.info = f"REST API ID: {self.rest_api_id}"
+        else:
+            self.info = "API MANAGMENT ARN"
 
     def get_api(self):
         self.rest_api_id = self.arn.full.split(":")[-1].split("/")[0]

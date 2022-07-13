@@ -20,7 +20,7 @@ class Public:
 
     def audit(self):
         if self.item.arn.service == "apigateway":
-            if self.item.policy:
+            if self.item.policy or not self.item.resources:
                 return
 
             apiKeyRequired = False
